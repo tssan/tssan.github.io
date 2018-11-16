@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    
+
+    
+    
+
+    
+        <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/default.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/styles/normalize.css">
+    <link rel="stylesheet" href="/static/styles/foundation.css">
+    <link rel="stylesheet" href="/static/styles/app.css">
+    <title>dojoit.pl</title>
+
+</head>
+<body data-debug="False">
+    
+    <header>
+    <a href="/"><img src="/static/images/logo.png"></a>
+    <h1>dojoit.pl</h1>
+    <div class="social-links">
+        <a target="blank" href="https://github.com/tssan"><i class="fab fa-github"></i></a>
+        <a target="blank" href="https://twitter.com/tss4n"><i class="fab fa-twitter"></i></a>
+    </div>
+</header>
+    <nav>
+    <ul>
+        <li>
+            <a href="/">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+        </li>
+        <li>
+            <a href="/articles.html">
+                <i class="far fa-newspaper"></i>
+                <span>Articles</span>
+            </a>
+        </li>
+        <li>
+            <a href="/about.html">
+                <i class="fas fa-info-circle"></i>
+                <span>About</span>
+            </a>
+        </li>
+        <li class="nav-expanded"></li>
+    </ul>
+</nav>
+
+    
+    <main>
+        <article>
+            <section class="section-head">
+                <h1 class="title">How to transpile, bundle and minify JS</h1>
+                <h2 class="subtitle">Go to production madness with JavaScript project</h2>
+                <div class="published-date">2018-10-04</div>
+            </section>
+            
+    <section class="section-paragraph">
+        <h2>Preface</h2>
+
+        <p>This is my first article, yey! :) Recently most my time in my projects I'm dealing with JavaScript. That's why I decided to write about something related to JavaScript. If you wish to know how to prepare your JS code to production then this is article for you.</p>
+
+        <p>Before I created this blog I wanted it to be a fully static page without any backend, no WordPress, no other CMS, just static files. It is not that convenient managing articles in raw html form when you don't have any tools that speed up the process. You can create templates and then copy-paste pages but it is not the way I imagine to update this blog. At start I had idea to use one of many static content generators. Just make simple html/css theme and write articles. Easy right? Too easy and boring. So I figured out why not build a static generator by myself..?</p>
+
+        <p>I have set some requirements for this project:
+            <ul>
+                <li>don't use Webpack and similar toolkits</li>
+                <li>have development server/watcher that doesn't require restart while editing source files</li>
+                <li>use some kind of template engine for static pages generation</li>
+                <li>must meet PWA requirements</li>
+            </ul>
+        </p>
+
+        <p>As I found out pretty quickly it is not that easy. A first hard part was to handle JavaScript files. I wished to use ES6+ syntax in development and then make transpiled to ES5 and minified bundle. There are some other dificult tasks when you build static page generator but in this article I want to focus on <strong>How to transpile, bundle and minify JS</strong> files.</p>
+    </section>
+
+    <p class="article-notice"><span class="first-word">Note:</span> JavaScript is just an implementation of ECMAScript specification.</p>
+
+    <section class="section-paragraph">
+        <h2>Theory</h2>
+
+        <p><strong>Transpiling</strong> - it is another word for compiling from source code to sorce code. In this case ES6+ to ES5. The problem is backward compatability. Code written in ES6+ in most cases wont work in ES5 and this is bad because ES5 is the most supported version. So if you wish your JS app work on all over the platforms, devices etc. you must convert your code into ES5.</p>
+
+        <p><strong>Bundling</strong> - "just" combining your chode into single file. JS in browsers doesn't support importing modules and that is huge problem because you never have only one file in projects, your code is splitted into multiple modules and so on. The solution is to concatenate all files into one. Thankfully ES6+ supports "imports".</p>
+
+        <p><strong>Minifying</strong> - reducing the size of files is not required but minifyng tools also comes with cool feature like reducing names of variables (mangle).</p>
+    </section>
+
+    <section class="section-paragraph">
+        <h2>Future</h2>
+
+        <p>Most users uses browsers in their latest versions which is very good news because modern broswers already support large amount of ES6 features. Still there are some not supported features that can break your code. It is hard to predict how fast ES6 will be fully supported and when writing in current stable ES version will not need transpiling. We are where we are and there are many tools for managing JS projects/source files. Let's deal with it ;)</p>
+
+        <p>In my opinion it is worth to learn newest ES specifications and start using all cool features. Sooner or later it will be supported and becomes standard.</p>
+    </section>
+
+    <section class="section-paragraph">
+        <h2>Setup</h2>
+
+        <p>To install all packages in examples below you need to have nodejs installed and npm or other package manager.</p>
+
+        <p>I assume that source folder have structure like this:</p>
+
+        <pre><code class="shell console">
+$ tree myproject
+.
+├── build
+├── node_modules
+└── src
+    ├── app.js
+    └── modules
+    └── components
+    └── ...
+└── .babelrc
+└── .gitignore
+└── Makefile
+└── package.json
+        </code></pre>
+    </section>
+
+    <section class="section-paragraph">
+        <h2>Babel</h2>
+
+        <p>First of lets convert some code into ES5 using Babel. Install core, cli and preset-env for basic usage.</p>
+
+        <pre><code class="shell console">
+$ npm install @babel/core @babel/cli @babel/preset-env
+        </code></pre>
+
+        <p>Command that converts a single file (<span class="ic">-o</span> or <span class="ic">--out-file</span>):</p>
+
+        <pre><code class="shell console">
+$ node_modules/.bin/babel src/app.js -o build/app.js
+        </code></pre>
+
+        <p>a directory (<span class="ic">-d</span> or <span class="ic">--out-dir</span>):</p>
+
+        <pre><code class="shell console">
+$ node_modules/.bin/babel src/ -d build/
+        </code></pre>
+
+        <p>You can keep babel running an watching your source files by adding <span class="ic">--watch</span> flag.</p>
+
+        <pre><code class="shell console">
+$ node_modules/.bin/babel src/ --watch -d build/
+        </code></pre>
+    </section>
+
+    <section class="section-paragraph">
+        <h2>Browserify</h2>
+
+        <p>If your code is contained in single file then skip this part and read about "uglifying".</p>
+
+        <p>Now when your code is in ES5 version it is good to bundle up files into single one. If you used ES6 "import" syntax then it probably is converted to "require" functions whitch is not supported on browsers. Solution to this is using tool like Browserify. I don't want to write in details about Browserify because it is well documented. In most cases you just pass source file path and output path into browserify command like so:</p>
+
+        <pre><code class="shell console">
+$ node_modules/.bin/browserify build/app.js > build/bundle.js
+        </code></pre>
+
+        <p>In larger projects when your bundle start to grow it maybe useful to extract common parts into separate bundle and have multiple bundles. In that case you should separate all common modules and bundle into one file and point to it while building other bundles:</p>
+
+        <pre><code class="shell console">
+$ node_modules/.bin/browserify -r src/common.js > build/common.js
+$ node_modules/.bin/browserify -x src/common.js src/moduleA.js > build/moduleA.js
+$ node_modules/.bin/browserify -x src/common.js src/moduleB.js > build/moduleB.js
+        </code></pre>
+
+        <p>There is also babelify transform module you can use with browserify which allow you to apply also babel transforms during bundling process. In that way you can skip using babel in separate command. To do that you must set special options in browserify command but first install module:</p>
+
+        <pre><code class="shell console">
+$ npm install babelify
+        </code></pre>
+
+        <p>then:</p>
+
+        <pre><code class="shell console">
+$ node_modules/.bin/browserify build/app.js > build/bundle.js -t [ babelify --no-sourceMaps --presets [ @babel/preset-env ] ]
+        </code></pre>
+
+        <p>This way you have bundle that can be already used in browser. What's left is to minify bundle!</p>
+    </section>
+
+    <section class="section-paragraph">
+        <h2>UglifyJS</h2>
+
+        <p>For compressing I'm using UglifyJS. It also can mangle variables and do other stuff but I will stick with minimal example here. It is also well documented so you shouldn't have problems with it. Lets minify our bundle file:</p>
+
+        <pre><code class="shell console">
+$ node_modules/.bin/uglifyjs -c build/bundle.js -o build/bundle.min.js
+        </code></pre>
+    </section>
+
+    <section class="section-paragraph">
+        <h2>Makefile</h2>
+
+        <p>I like put all commands that I use often in Makefile. Obviously it speeds up development when you use short cmd like: <span class="ic">make build</span> instead of <span class="ic">...bin/browserify app.js &gt; bundle.js</span>. One more important fact is that it prevents you from mistakes like typo in commands or passing incorrect paths.</p>
+
+        <p>In this stage my Makefile would be looking like so:</p>
+
+        <pre><code class="makefile">
+NODE_BIN?=./node_modules/.bin
+SRC_PATH?=./src
+BUILD_PATH?=./build
+
+.PHONY: install
+install:
+    @npm i
+
+.PHONY: clean
+clean:
+    @rm $(BUILD_PATH)
+
+.PHONY: babel
+babel:
+    @$(NODE_BIN)/babel $(SRC_PATH) -d $(BUILD_PATH)
+
+.PHONY: browserify
+browserify:
+    @$(NODE_BIN)/browserify $(BUILD_PATH)/app.js > $(BUILD_PATH)/bundle.js -t [ babelify --no-sourceMaps --presets [ @babel/preset-env ] ]
+
+.PHONY: uglify
+uglify:
+    @$(NODE_BIN)/uglifyjs -c $(BUILD_PATH)/bundle.js -o $(BUILD_PATH)/bundle.min.js
+
+.PHONY: build
+build:
+    @$(MAKE) clean
+    @mkdir -p build
+    @$(MAKE) babel
+    @$(MAKE) browserify
+    @$(MAKE) uglify
+        </code></pre>
+
+        <p>Now if you wish to rebuild all files run:</p>
+
+        <pre><code class="shell console">
+$ make clean build
+        </code></pre>
+
+        <p>If you pass BUILD_PATH environment variable then you can change build folder path:</p>
+
+        <pre><code class="shell console">
+$ BUILD_PATH=/some_other_path/build make clean build
+        </code></pre>
+    </section>
+
+    <section class="section-paragraph">
+        <h2>Summary</h2>
+
+        <p>To sum up there are 3 steps to prepare your project to production:
+            <ol>
+                <li>Convert/transpile to ES5 - Babel</li>
+                <li>Bundle files - Browserify</li>
+                <li>Compress/minify - UglifyJS</li>
+            </ol>
+        </p>
+
+        <p>
+            If you use babelify with Browserify then you will reduce that into 2 steps. Ofcourse there are many tools like Webpack that can handle that and more tasks. It always require to learn how to configure all tools and it can be very time consuming. From my expirience it is not that convinient as you would think. I'm pretty sure that configuring Webpack takes more time than making simple Makefile or bash script that lunches few commands.
+        </p>
+
+        <p>
+            Thanks for reading and please leave any comment below. Cheers!
+        </p>
+    </section>
+
+        </article>
+    </main>
+
+    
+        <section class="section-comments">
+            <div id="disqus_thread"></div>
+            <script>
+
+
+            var disqus_config = function () {
+                this.page.url = 'http://dojoit.pl/articles/ifymadness.html';
+                this.page.identifier = 'ifymadness';
+            };
+
+            (function() {
+            var d = document, s = d.createElement('script');
+            s.src = 'https://dojoit.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+            })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </section>
+    
+
+
+    
+    <footer>2018 - dojo it</footer>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    <script type="text/javascript">
+        window.DOJOIT = {
+            articles: {"ifymadness": {"title": "How to transpile, bundle and minify JS", "slug": "ifymadness", "tpl_filename": "ifymadness.html", "description": "Go to production madness with JavaScript project", "tags": ["javascript", "ecmascript", "es6", "es5", "babel", "browserify", "uglifyjs"], "published": true, "published_date": "2018-10-04", "created_ctime": 1542364834.0, "created_at": "2018-11-16 11:40:34", "url": "http://dojoit.pl/articles/ifymadness.html"}},
+            article_slugs: ["ifymadness"],
+            tags: {"javascript": 1, "ecmascript": 1, "es6": 1, "es5": 1, "babel": 1, "browserify": 1, "uglifyjs": 1}
+        }
+    </script>
+    
+    
+            <script type="text/javascript" src="/sw.min.js"></script>
+        
+    
+            <script type="text/javascript" src="/static/js/app.min.js"></script>
+        
+
+</body>
+</html>
