@@ -10,7 +10,19 @@
     
 
     
-        <link rel="manifest" href="/manifest.webmanifest">
+        
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-129275784-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-129275784-1');
+        </script>
+    
+
+    <link rel="manifest" href="/manifest.webmanifest">
     <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
@@ -62,21 +74,21 @@
             <section class="section-head">
                 <h1 class="title">How to transpile, bundle and minify JS</h1>
                 <h2 class="subtitle">Go to production madness with JavaScript project</h2>
-                <div class="published-date">2018-10-04</div>
+                <div class="published-date">2018-10-14</div>
             </section>
             
     <section class="section-paragraph">
         <h2>Preface</h2>
 
-        <p>This is my first article, yey! :) Recently, while working on my projects I'm spending a lot of time dealing with JavaScript. That's why I decided to write about something related to JavaScript. If you wish to know how to prepare your JS code to production then this is an article for you.</p>
+        <p>This is my first article, yey! :) Recently most my time in my projects I'm dealing with JavaScript. That's why I decided to write about something related to JavaScript. If you wish to know how to prepare your JS code to production then this is article for you.</p>
 
-        <p>Before I created this blog I wanted it to be a fully static page without any backend, no WordPress, no other CMS, just static files. It is not that convenient managing articles in raw html form when you don't have any tools that speed up the process. You can create templates and then copy-paste pages but it is not the way I imagine to update this blog. At the beginning I had an idea to use one of many static content generators. Just to make simple html/css theme and write articles. Easy right? Too easy and boring. So I figured out why not build a static generator myself..?</p>
+        <p>Before I created this blog I wanted it to be a fully static page without any backend, no WordPress, no other CMS, just static files. It is not that convenient managing articles in raw html form when you don't have any tools that speed up the process. You can create templates and then copy-paste pages but it is not the way I imagine to update this blog. At start I had idea to use one of many static content generators. Just make simple html/css theme and write articles. Easy right? Too easy and boring. So I figured out why not build a static generator by myself..?</p>
 
         <p>I have set some requirements for this project:
             <ul>
                 <li>don't use Webpack and similar toolkits</li>
-                <li>to have development server/watcher that doesn't require restart while editing source files</li>
-                <li>to use some kind of template engine for static pages generation</li>
+                <li>have development server/watcher that doesn't require restart while editing source files</li>
+                <li>use some kind of template engine for static pages generation</li>
                 <li>must meet PWA requirements</li>
             </ul>
         </p>
@@ -89,9 +101,9 @@
     <section class="section-paragraph">
         <h2>Theory</h2>
 
-        <p><strong>Transpiling</strong> - it is another word for compiling from source code to sorce code. In this case ES6+ to ES5. The problem is backward compatability. Code written in ES6+ in most cases wont work in ES5 and this is bad because ES5 is the most supported version. So if you wish that your JS app work on all platforms, devices etc. you must convert your code into ES5.</p>
+        <p><strong>Transpiling</strong> - it is another word for compiling from source code to sorce code. In this case ES6+ to ES5. The problem is backward compatability. Code written in ES6+ in most cases wont work in ES5 and this is bad because ES5 is the most supported version. So if you wish your JS app work on all over the platforms, devices etc. you must convert your code into ES5.</p>
 
-        <p><strong>Bundling</strong> - "just" combining your chode into single file. JS in browsers doesn't support importing modules and that is a huge problem because you never have only one file in projects. Your code is split into multiple modules and so on. The solution is to concatenate all files into one. Thankfully ES6+ supports "imports".</p>
+        <p><strong>Bundling</strong> - "just" combining your chode into single file. JS in browsers doesn't support importing modules and that is huge problem because you never have only one file in projects, your code is splitted into multiple modules and so on. The solution is to concatenate all files into one. Thankfully ES6+ supports "imports".</p>
 
         <p><strong>Minifying</strong> - reducing the size of files is not required but minifyng tools also comes with cool feature like reducing names of variables (mangle).</p>
     </section>
@@ -99,9 +111,9 @@
     <section class="section-paragraph">
         <h2>Future</h2>
 
-        <p>Most users use browsers in their latest versions which is very good news because modern broswers already support large amount of ES6 features. Still, there are somefeatures that are not supported and that can break your code. It is hard to predict when ES6 will be fully supported and when writing in current stable ES version will not need transpiling. We are where we are and there are many tools for managing JS projects/source files. Let's deal with it ;)</p>
+        <p>Most users uses browsers in their latest versions which is very good news because modern broswers already support large amount of ES6 features. Still there are some not supported features that can break your code. It is hard to predict how fast ES6 will be fully supported and when writing in current stable ES version will not need transpiling. We are where we are and there are many tools for managing JS projects/source files. Let's deal with it ;)</p>
 
-        <p>In my opinion it is worth to learn newest ES specifications and start using all cool features. Sooner or later it will be supported and will become standard.</p>
+        <p>In my opinion it is worth to learn newest ES specifications and start using all cool features. Sooner or later it will be supported and becomes standard.</p>
     </section>
 
     <section class="section-paragraph">
@@ -131,7 +143,7 @@ $ tree myproject
     <section class="section-paragraph">
         <h2>Babel</h2>
 
-        <p>First, lets convert code into ES5 using Babel. Install core, cli and preset-env for basic usage.</p>
+        <p>First of lets convert some code into ES5 using Babel. Install core, cli and preset-env for basic usage.</p>
 
         <pre><code class="shell console">
 $ npm install @babel/core @babel/cli @babel/preset-env
@@ -149,7 +161,7 @@ $ node_modules/.bin/babel src/app.js -o build/app.js
 $ node_modules/.bin/babel src/ -d build/
         </code></pre>
 
-        <p>You can keep Babel running to watch your source files by adding <span class="ic">--watch</span> flag.</p>
+        <p>You can keep babel running an watching your source files by adding <span class="ic">--watch</span> flag.</p>
 
         <pre><code class="shell console">
 $ node_modules/.bin/babel src/ --watch -d build/
@@ -161,13 +173,13 @@ $ node_modules/.bin/babel src/ --watch -d build/
 
         <p>If your code is contained in single file then skip this part and read about "uglifying".</p>
 
-        <p>Now when your code is in ES5 version it is good to bundle up files into single one. If you used ES6 "import" syntax then proabably you have converted it to "require" functions which are not supported by browsers. The solution is to use a tool like Browserify. I don't want to write in details about Browserify because it is well documented. In most cases you just pass source file path and output path into browserify command like so:</p>
+        <p>Now when your code is in ES5 version it is good to bundle up files into single one. If you used ES6 "import" syntax then it probably is converted to "require" functions whitch is not supported on browsers. Solution to this is using tool like Browserify. I don't want to write in details about Browserify because it is well documented. In most cases you just pass source file path and output path into browserify command like so:</p>
 
         <pre><code class="shell console">
 $ node_modules/.bin/browserify build/app.js > build/bundle.js
         </code></pre>
 
-        <p>In larger projects when your bundle start to grow it might be useful to extract common parts into separate bundle and have multiple files. In that case you should separate all common modules and bundle them into one file and point to it while building other bundles:</p>
+        <p>In larger projects when your bundle start to grow it maybe useful to extract common parts into separate bundle and have multiple bundles. In that case you should separate all common modules and bundle into one file and point to it while building other bundles:</p>
 
         <pre><code class="shell console">
 $ node_modules/.bin/browserify -r src/common.js > build/common.js
@@ -175,7 +187,7 @@ $ node_modules/.bin/browserify -x src/common.js src/moduleA.js > build/moduleA.j
 $ node_modules/.bin/browserify -x src/common.js src/moduleB.js > build/moduleB.js
         </code></pre>
 
-        <p>There is also babelify transform module you can use with browserify which allows you to apply babel transforms during bundling process. In that way you can skip using babel in separate command. To do that you must set special options in browserify command, but first install module:</p>
+        <p>There is also babelify transform module you can use with browserify which allow you to apply also babel transforms during bundling process. In that way you can skip using babel in separate command. To do that you must set special options in browserify command but first install module:</p>
 
         <pre><code class="shell console">
 $ npm install babelify
@@ -203,9 +215,7 @@ $ node_modules/.bin/uglifyjs -c build/bundle.js -o build/bundle.min.js
     <section class="section-paragraph">
         <h2>Makefile</h2>
 
-        <p>All the commands that I often use I like to put in Makefile.</p>
-
-        <p>It's good to remember that using short cmd like: <span class="ic">make build</span> instead of <span class="ic">...bin/browserify app.js &gt; bundle.js</span> speeds up the developmen. One more important fact is that it prevents you from making mistakes like typos in commands or passing incorrect paths.</p>
+        <p>I like put all commands that I use often in Makefile. Obviously it speeds up development when you use short cmd like: <span class="ic">make build</span> instead of <span class="ic">...bin/browserify app.js &gt; bundle.js</span>. One more important fact is that it prevents you from mistakes like typo in commands or passing incorrect paths.</p>
 
         <p>In this stage my Makefile would be looking like so:</p>
 
@@ -268,7 +278,7 @@ $ BUILD_PATH=/some_other_path/build make clean build
         </p>
 
         <p>
-            If you use babelify with Browserify then you will reduce that into 2 steps. Of course, there are many tools like Webpack that can handle that and some other tasks. Mastering those tools or sometimes entry level can be time consuming. From my experience it is not as convenient as you would think. I'm pretty sure that configuring Webpack takes more time than making a simple Makefile or bash script that lunches few commands.
+            If you use babelify with Browserify then you will reduce that into 2 steps. Ofcourse there are many tools like Webpack that can handle that and more tasks. It always require to learn how to configure all tools and it can be very time consuming. From my expirience it is not that convinient as you would think. I'm pretty sure that configuring Webpack takes more time than making simple Makefile or bash script that lunches few commands.
         </p>
 
         <p>
@@ -312,9 +322,9 @@ $ BUILD_PATH=/some_other_path/build make clean build
 
     <script type="text/javascript">
         window.DOJOIT = {
-            articles: {"ifymadness": {"title": "How to transpile, bundle and minify JS", "slug": "ifymadness", "tpl_filename": "ifymadness.html", "description": "Go to production madness with JavaScript project", "tags": ["javascript", "ecmascript", "es6", "es5", "babel", "browserify", "uglifyjs"], "published": true, "published_date": "2018-10-04", "created_ctime": 1542364834.0, "created_at": "2018-11-16 11:40:34", "url": "http://dojoit.pl/articles/ifymadness.html"}},
+            articles: {"ifymadness": {"url": "http://dojoit.pl/articles/ifymadness.html", "title": "How to transpile, bundle and minify JS", "tpl_filename": "ifymadness.html", "published": true, "published_date": "2018-10-14", "created_at": "2018-11-18 11:20:17", "slug": "ifymadness", "created_ctime": 1542536417.6716762, "tags": ["javascript", "ecmascript", "es6", "es5", "babel", "browserify", "uglifyjs"], "description": "Go to production madness with JavaScript project"}},
             article_slugs: ["ifymadness"],
-            tags: {"javascript": 1, "ecmascript": 1, "es6": 1, "es5": 1, "babel": 1, "browserify": 1, "uglifyjs": 1}
+            tags: {"javascript": 1, "uglifyjs": 1, "es6": 1, "es5": 1, "ecmascript": 1, "babel": 1, "browserify": 1}
         }
     </script>
     
