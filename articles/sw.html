@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    
+
+    
+    
+
+    
+        
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-129275784-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-129275784-1');
+        </script>
+    
+
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/default.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Share+Tech+Mono" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/styles/app.css">
+    <title>dojoit.pl</title>
+
+</head>
+<body data-debug="False">
+    
+    <header>
+    <a href="/"><img src="/static/images/logo.png"></a>
+    <h1>dojoit.pl</h1>
+    <div class="social-links">
+        <a target="blank" href="https://github.com/tssan"><i class="fab fa-github"></i></a>
+        <a target="blank" href="https://twitter.com/tss4n"><i class="fab fa-twitter"></i></a>
+    </div>
+</header>
+    <nav>
+    <ul>
+        <li>
+            <a href="/">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+        </li>
+        <li>
+            <a href="/articles.html">
+                <i class="far fa-newspaper"></i>
+                <span>Articles</span>
+            </a>
+        </li>
+        <li>
+            <a href="/about.html">
+                <i class="fas fa-info-circle"></i>
+                <span>About</span>
+            </a>
+        </li>
+        <li class="nav-expanded"></li>
+    </ul>
+</nav>
+
+    
+    <main>
+        <article>
+            <section class="section-head">
+                <h1 class="title">Service Workers for beginners</h1>
+                <h2 class="subtitle">What is Service Worker and what can you do with it?</h2>
+                <div class="published-date">2018-10-20</div>
+            </section>
+            
+     <section class="section-paragraph">
+        <h2>What is Service Worker?</h2>
+
+        <p>Service Worker is a JavaScript that runs on separate thread. It doesn't have access to DOM as the website's main script. Why is it so important and for what reason you can use SW?</p>
+
+        <p>When website runs JS scripts, it uses single thread. Every event like mouse click or move, scrolling and listening inputs are handeled by this main thread. That means when code is broken end eg. stuck in infinite loop then everything will freeze. It is also possible by SW to control network requests which makes it really powerfull tool. Also if you wish to do any time consuming computations you can pass that heavy work to SW. Those things very much are affecting user's expirience and as you probably know the responsiveness is very important nowadays.</p>
+
+        <h3>Progressive Web App</h3>
+
+        <p>PWA is a website that can work offline - this is the simplest definition I can think of. I'm mentioning about it because PWA doesn't exist without Service Worker. Acctually it is SW that do all the work. Managing network requests you can specify which response should be cached. This way you can render cached data being offline. There is more cool features like adding shortcut to mobile homescreen, setting theme colors, no browser url bar, custom icons. On mobile devices PWA looks just like native application.</p>
+
+        <p>Those are the basic informations about Service Worker and Progressive Web App. I'm not going into more details. I hope it will help you understand a bit more this subject. Let's make some working example now.</p>
+    </section>
+
+    <section class="section-paragraph">
+        <h2>Quotes PWA - example</h2>
+
+        <p>You can find full example <a href="https://github.com/tssan/quotes-pwa">here</a></p>
+
+        <p>Ok lets set some rules how this example should work:</p>
+        <ul>
+            <li>show random quote from fetched quotes</li>
+            <li>on load fetch quotes</li>
+            <li>on button click change random quote (show next)</li>
+        </ul>
+        <p>Changing quotes should work offline. Fetched quotes should be cached.</p>
+
+        <h3>Samples - quotes.json</h3>
+
+        <p>Project structure will look more or less like so:</p>
+
+        <pre><code class="shell console">
+$ tree quotes-pwa
+.
+├── node_modules
+├── src
+    ├── app.css
+    ├── app.js
+    ├── icon.png
+    ├── index.html
+    ├── manifest.webmanifest
+    └── sw.js
+├── .gitignore
+├── Makefile
+├── package.json
+└── quotes.json
+        </code></pre>
+
+        <p>As we assumed, quotes will be fetched from external source. I'm using <span class="ic">json-server</span> for this task. It will serve json file on default port 3000. You can use any server you like but remeber later to pass correct url into <span class="ic">fetch</span> function. First prepare sample json like this:</p>
+
+        <pre><code class="json">
+// quotes.json
+
+{
+    "quotes": [
+        {"id": 0, "quote": "Ut in id fugiat dolor ut aute consectetur eu eu laboris ex enim  consequat eu ad dolore."},
+        {"id": 1, "quote": "Mollit deserunt ullamco ex in ut nisi do culpa ea culpa fugiat irure sint consectetur."},
+        {"id": 2, "quote": "Id sint pariatur laboris officia est laboris eu velit id nulla nulla incididunt amet occaecat."},
+        ...
+    ]
+}
+        </code></pre>
+
+        <p>Next install <span class="ic">json-server</span>:</p>
+
+        <pre><code class="shell console">
+$ npm install --save-dev json-server
+        </code></pre>
+
+        <p>Lets create Makefile:</p>
+
+        <pre><code class="makefile">
+NODE_BIN?=./node_modules/.bin
+SRC_PATH?=./src
+
+
+.PHONY: install
+install:
+    @npm i
+
+.PHONY: clean
+clean:
+    @rm -rf node_modules
+
+.PHONY: run
+run:
+    @cd $(SRC_PATH) && python -m SimpleHTTPServer 8010
+
+.PHONY: quotes-api
+quotes-api:
+    @$(NODE_BIN)/json-server --watch quotes.json
+</code></pre>
+
+        <p>Now if you run <span class="ic">make quotes-api</span> and go to <span class="ic">http://localhost:3000</span> you should see quotes.json content.</p>
+
+        <h3>App page - HTML & js</h3>
+
+        <p>HTML is very short and simple. For styling you can use any css framework or create your own styles. I'm using bootstrap.</p>
+
+        <pre><code class="html">
+// index.html
+
+&lt;body&gt;
+    &lt;main class="container shadow-sm p-3 mb-5 rounded"&gt;
+        &lt;blockquote id="quote-box" class="blockquote shadow-sm p-3 mb-5 bg-white rounded"&gt;loading...&lt;/blockquote&gt;
+        &lt;button id="quote-btn" class="btn btn-primary"&gt;Show next quote&lt;/button&gt;
+    &lt;/main&gt;
+
+    &lt;script type="text/javascript" src="app.js"&gt;&lt;/script&gt;
+    &lt;script type="text/javascript" src="sw.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+        </code></pre>
+
+        <p>Lets handle fetching quotes and handle button click.</p>
+
+        <pre><code class="javascript">
+// app.js
+
+async function app() {
+    const quotes = await fetch('http://localhost:3000/quotes').then(resp => resp.json())
+    const quoteBtn = document.getElementById('quote-btn')
+    const quoteBox = document.getElementById('quote-box')
+    let idx = 0
+
+    quoteBtn.addEventListener('click', e => {
+        idx++;
+        quoteBox.innerHTML = quotes[idx % quotes.length].quote
+    })
+
+    if(quotes.length > 0) {
+        quoteBox.innerHTML = quotes[idx % quotes.length].quote
+    }
+}
+
+window.addEventListener('load', () => {
+    app()
+})
+        </code></pre>
+
+        <p>To be sure document is loaded I'm listening window <span class="ic">load</span> event. Everything is inside app function where I'm incresing index on button click and updating <span class="ic">#quote-box</span> content.</p>
+
+        <h3>PWA</h3>
+
+        <p>First step in creating PWA page is adding mainfest file into head block.</p>
+
+        <pre><code class="html">
+&lt;link rel="manifest" href="/manifest.webmanifest"/&gt;
+        </code></pre>
+
+        <p>Manifest is just a JSON file. There are few required attributes to make it work, here is an example how a manifest can look like:</p>
+
+        <pre><code class="json">
+// manifest.webmanifest
+
+{
+    "name": "Quotes PWA",
+    "short_name": "quotes",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#206846",
+    "theme_color": "#206846",
+    "description": "Service Worker example.",
+    "icons": [
+        {
+            "src": "icon.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        }
+    ]
+}
+        </code></pre>
+
+        <p>In Chrome Development Tools <span class="ic">Application</span> tab should show manifest parameters like so:</p>
+
+        <a href="/static/images/articles/sw_1.png">
+            <img src="/static/images/articles/sw_1.png" alt="Chrome Dev Tools screenshot"/>
+        </a>
+
+        <h3>Service Worker</h3>
+
+        <p>Last missing pice is a Service Worker. Create <span class="ic">sw.js</span> file. Then it must be registered. In this example lets do this in <span class="ic">app.js</span>:</p>
+
+        <pre><code class="javascript">
+// app.js
+
+...
+
+async function registerSW() {
+    if('serviceWorker' in navigator) {
+        try {
+            await navigator.serviceWorker.register('/sw.js')
+        } catch (e) {
+            console.log('SW registration failed')
+        }
+    }
+}
+
+window.addEventListener('load', () => {
+    app()
+    registerSW()
+})
+        </code></pre>
+
+        <p>Last thing to do is implement SW itself. This is very powerful tool. In SW script you decide how and when cache fatched data, which static files should be cached and which caching strategy should be used.</p>
+
+        <p>All code put in <span class="ic">sw.js</span>. Choose name for app cache and define all statics that should be cached on <span class="ic">install</span> event.</p>
+
+        <pre><code class="javascript">
+const cacheName = 'quotespwa'
+const staticAssets = [
+    '/icon.png',
+    '/app.js',
+    '/app.css',
+    '/index.html'
+]
+        </code></pre>
+
+        <p>SW has it's own lifecycle. At start <span class="ic">install</span> event is triggered. Then if successful <span class="ic">activate</span> event. Simple code to handle those two you can write like so:</p>
+
+        <pre><code class="javascript">
+self.addEventListener('install', async e => {
+    const cache = await caches.open(cacheName)
+    await cache.addAll(staticAssets)
+    return self.skipWaiting()
+})
+
+self.addEventListener('activate', e => {
+    self.clients.claim()
+})
+        </code></pre>
+
+        <p>Ok, this is looking good already. Now it would be great to intercept fetch requests and cache them. General there are two cases:
+            <ol>
+                <li>same origin requests</li>
+                <li>cross origin requests</li>
+            </ol>
+        </p>
+
+        <p>In first case scenario we know that response should be in cache because it is from same host. It might need special handling when it is call for some dynamic data like API call but in this example we will ignore that.</p>
+
+        <pre><code class="javascript">
+async function cacheFirst(req) {
+    const cache = await caches.open(cacheName)
+    const cached = await cache.match(req)
+    return cached || fetch(req)
+}
+        </code></pre>
+
+        <p>In second case first we want to get 'fresh' response and then put it in cache. If somehow that fails then get response from cache.</p>
+
+        <pre><code class="javascript">
+async function networkAndCache(req) {
+    const cache = await caches.open(cacheName)
+    try {
+        const freshResponse = await fetch(req)
+        await cache.put(req, freshResponse.clone())
+        return freshResponse
+    } catch (e) {
+        const cached = await cache.match(req)
+        return cached
+    }
+}
+        </code></pre>
+
+        <p>To pass cached response to the fetch, worker uses 'event.respondWith' function like so:</p>
+
+        <pre><code class="javascript">
+self.addEventListener('fetch', async e => {
+    const req = e.request
+    const url = new URL(req.url)
+    if(url.origin === location.origin) {
+        e.respondWith(cacheFirst(req))
+    } else {
+        e.respondWith(networkAndCache(req))
+    }
+})
+        </code></pre>
+
+        <p>At this point PWA page is completed. You can check in Dev Tools what is cached and try simulate offline state. Quotes should be retreived from cache in offline mode.</p>
+    </section>
+
+    <section class="section-paragraph">
+        <h2>Summary</h2>
+
+        <p>This example showed how to setup necessary parts of website to meet PWA requirements which are:
+            <ul>
+                <li>create and link <span class="ic">manifest.webmanifest</span> file</li>
+                <li>register Service Worker</li>
+                <li>implement functions handling SW's lifecycle events</li>
+            </ul>
+        </p>
+
+        <p>In more complicated app the caching functions would be much more complex. There are already libraries that can handle it for you but it is very good problem to try solve and learn from it. So I encourage you to at least try experiment with this example using low level SW API.</p>
+
+        <p>Code is available <a href="https://github.com/tssan/quotes-pwa">here</a></p>
+
+        <p>Thanks for reading and please leave any comment below. Cheers!</p>
+    </section>
+
+        </article>
+    </main>
+
+    
+        <section class="section-comments">
+            <div id="disqus_thread"></div>
+            <script>
+
+
+            var disqus_config = function () {
+                this.page.url = 'http://dojoit.pl/articles/sw.html';
+                this.page.identifier = 'sw';
+            };
+
+            (function() {
+            var d = document, s = d.createElement('script');
+            s.src = 'https://dojoit.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+            })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </section>
+    
+
+
+    
+    <footer>2018 - dojo it</footer>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    <script type="text/javascript">
+        window.DOJOIT = {
+            articles: {"sw": {"created_at": "2018-11-20 22:28:19", "slug": "sw", "title": "Service Workers for beginners", "created_ctime": 1542749299.7107062, "tags": ["javascript", "pwa", "service worker"], "wip": true, "published": false, "tpl_filename": "sw.html", "url": "http://dojoit.pl/articles/sw.html", "published_date": "2018-10-20", "description": "What is Service Worker and what can you do with it?"}, "ifymadness": {"created_at": "2018-11-19 20:25:38", "slug": "ifymadness", "title": "How to transpile, bundle and minify JS", "created_ctime": 1542655538.6148407, "tags": ["javascript", "ecmascript", "es6", "es5", "babel", "browserify", "uglifyjs"], "wip": false, "published": true, "tpl_filename": "ifymadness.html", "url": "http://dojoit.pl/articles/ifymadness.html", "published_date": "2018-10-14", "description": "Go to production madness with JavaScript project"}},
+            article_slugs: ["sw", "ifymadness"],
+            tags: {"javascript": 2, "browserify": 1, "es6": 1, "service worker": 1, "pwa": 1, "babel": 1, "uglifyjs": 1, "ecmascript": 1, "es5": 1}
+        }
+    </script>
+    
+    
+            <script type="text/javascript" src="/static/js/app.min.js"></script>
+        
+
+</body>
+</html>
