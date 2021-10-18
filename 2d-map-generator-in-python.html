@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>dojoit.pl</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+
+    <link rel="stylesheet" type="text/css" href="/theme/css/blog.css"/>
+    <link rel="stylesheet" type="text/css" href="/theme/vendors/fontawesome/css/all.min.css"/>
+</head>
+<body>
+
+<div class="body-wrapper">
+  <header class="main">
+    <a class="logo" href="/"><img src="/theme/images/dojoit-logo.png" alt="logo"/><span>dojoit.pl</span></a>
+  </header>
+
+  <nav class="main desktop-hidden"><ul>
+    <li><a href="/"><i class="fas fa-home"></i></a></li>
+    <li><a class="nav-link" href="/pages/curriculum-vitae.html">CV</a></li>
+    <li><a class="nav-link" href="/pages/about.html">About</a></li>
+    <li class="inlines">
+      <a href="https://twitter.com/tss4n" target="_blank"><i class="fab fa-twitter"></i></a>
+      <a href="https://github.com/tssan" target="_blank"><i class="fab fa-github"></i></a></li>
+  </ul></nav>
+  <!-- /#menu -->
+
+  <div id="content">
+<div id="article">
+    <header>
+        <h1 class="title">2d map generator in Python</h1>
+        
+    </header>
+
+    <div class="content"><h1>Constraints and objectives</h1>
+<p>The main goal of this article is to show, how to build a tool that can produce 2d map in a reusable structure. This topic is new to me so I did some research. I found a pretty easy and stright-forward alghoritm - binary space partitioning (BSP). It turns out that BSP alghoritm is often used in game development. First search hit was <a href="https://gamedev.stackexchange.com/questions/82059/algorithm-for-procedureral-2d-map-with-connected-paths" target="_blank">gamedev.stackexchange.com</a>. I founded examples that meet my expectations and are close enough to help me achive my goal which is randomized 2d map. Maybe after this little project I will try other alghoritms to create some irregular shaped maps, we will see how it goes. The programming language for this task will be Python.</p>
+<p>Let's make a TODO list:</p>
+<ul>
+<li>store map in text file with some kind of 2 dimenssional array</li>
+<li>the map is built of two elements: rooms (rectangles) and paths (lines)</li>
+<li>generator should be parameterized:<ul>
+<li>width and height of the map where 1 unit is a square tile that later on can be defined as you wish</li>
+<li>minimal room's wall size</li>
+<li>minimal ratio of room's width and height</li>
+<li>minimal area of the room regarding splited area</li>
+<li>number of splits (for BSP)</li>
+<li>(*) free space between rooms (padding)</li>
+</ul>
+</li>
+<li>(*) make a map preview, eg. as PNG image</li>
+</ul>
+<p>(*) options are optional</p>
+<blockquote>
+<p>You can get complete code for this tutorial on my github <a href="https://github.com/tssan/rand2dmap" target="_blank">here</a>.</p>
+</blockquote>
+<h1>Map file &amp; data structure</h1>
+<p>Map is a container for square tiles. In this project we will have 3 types of tiles:</p>
+<ul>
+<li>wall - represented by "0"</li>
+<li>room - "1"</li>
+<li>path = "2"</li>
+</ul>
+<p>Example of 10x10 map with 2 rooms and single path:</p>
+<div class="highlight"><pre><span></span><code>// sample.map
+
+0000000000
+0111100000
+0111100000
+0111100000
+0002000000
+0002000000
+0011111110
+0011111110
+0011111110
+0000000000
+</code></pre></div>
+
+<p>In code this data will be 2-dimensional array:</p>
+<div class="highlight"><pre><span></span><code><span class="n">MAP_ARRAY</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;2&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;2&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;1&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">,</span><span class="s1">&#39;0&#39;</span><span class="p">]</span>
+<span class="p">]</span>
+</code></pre></div>
+
+<h1>BSP algorithm</h1>
+<p>I will simplify the definition of this algorithm by limiting it to our particular problem. We want to randomly split a rectangle area. Then we split these 2 rectangles the same way as in the previous step and so on... until number of splits will be achieved. To understand it better look at images below.</p>
+<p><a href="/images/split.png" target="_blank"><img alt="BSP algorithm" src="/images/split.png"></a></p>
+<p>To implement this idea we need a data structure that will hold all informations about splitted rectangles. Binary tree for the rescue! Let's define base classes.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># tree.py</span>
+
+<span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
+
+
+<span class="k">class</span> <span class="nc">Rect</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+</code></pre></div>
+
+<p>A word of explanation here. Node's attribute <code>data</code> in our case will be a type of <code>Rect</code> class. Ok! What now..? For sure we will need a function that randomly splits a <code>Rect</code> object into 2. Python's standard library <code>random</code> will be helpful here.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># tree.py</span>
+
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
+
+
+<span class="k">def</span> <span class="nf">split_rect</span><span class="p">(</span><span class="n">rect</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># split vertical</span>
+        <span class="n">r1</span> <span class="o">=</span> <span class="n">Rect</span><span class="p">(</span>
+            <span class="n">rect</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">),</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span>
+        <span class="p">)</span>
+        <span class="n">r2</span> <span class="o">=</span> <span class="n">Rect</span><span class="p">(</span>
+            <span class="n">rect</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">r1</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">rect</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="n">r1</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># split horizontal</span>
+        <span class="n">r1</span> <span class="o">=</span> <span class="n">Rect</span><span class="p">(</span>
+            <span class="n">rect</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">r2</span> <span class="o">=</span> <span class="n">Rect</span><span class="p">(</span>
+            <span class="n">rect</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">r1</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+            <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span> <span class="o">-</span> <span class="n">r1</span><span class="o">.</span><span class="n">height</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">r1</span><span class="p">,</span> <span class="n">r2</span>
+</code></pre></div>
+
+<p>Minimal room's wall size or padding will be added to <code>split_rect</code> function later on. Next step is to write a "split" function.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">split_tree_of_rectangles</span><span class="p">(</span><span class="n">rect</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">split</span> <span class="o">=</span> <span class="n">split_rect</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">split_tree_of_rectangles</span><span class="p">(</span><span class="n">split</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">step</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">split_tree_of_rectangles</span><span class="p">(</span><span class="n">split</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">step</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tree</span>
+</code></pre></div>
+
+<p>As you can see function is simple. We recursively creating nodes until step is 0. Notice that the more splits we create the smaller the rooms will get.</p>
+<h1>Main program</h1>
+<p>Things to do:</p>
+<ul>
+<li>set constants</li>
+<li>create tree of rectangles</li>
+<li>initialize MAP_ARRAY with zeros</li>
+<li>update MAP_ARRAY using tree</li>
+<li>save MAP_ARRAY into the file</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1"># generator.py</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">rand2dmap.tree</span> <span class="kn">import</span> <span class="n">Rect</span><span class="p">,</span> <span class="n">split_tree_of_rectangles</span>
+
+
+<span class="n">MAP_WIDTH</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">MAP_HEIGHT</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="n">SPLITS</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="n">MAPS_PATH</span> <span class="o">=</span> <span class="s1">&#39;./.maps&#39;</span>
+
+
+<span class="n">wrap_rect</span> <span class="o">=</span> <span class="n">Rect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MAP_WIDTH</span><span class="p">,</span> <span class="n">MAP_HEIGHT</span><span class="p">)</span>
+<span class="n">tree</span> <span class="o">=</span> <span class="n">split_tree_of_rectangles</span><span class="p">(</span><span class="n">wrap_rect</span><span class="p">,</span> <span class="n">SPLITS</span><span class="p">)</span>
+
+<span class="n">MAP_ARRAY</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">MAP_HEIGHT</span><span class="p">):</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">MAP_WIDTH</span><span class="p">):</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+    <span class="n">MAP_ARRAY</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">update_rooms</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">is_leaf</span><span class="p">:</span>
+        <span class="n">room</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">room</span>
+
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">room</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">room</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">room</span><span class="o">.</span><span class="n">width</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">room</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">room</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">room</span><span class="o">.</span><span class="n">height</span><span class="p">):</span>
+                <span class="n">MAP_ARRAY</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># create path between leaf&#39;s centers (nodes not rooms!)</span>
+        <span class="n">l1</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">l2</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">c1</span> <span class="o">=</span> <span class="p">(</span><span class="n">l1</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">l1</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">l1</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">l1</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="p">(</span><span class="n">l2</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">l2</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">l2</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">l2</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">c2</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">c1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c2</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">MAP_ARRAY</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
+        <span class="k">if</span> <span class="n">c1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">c2</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">c1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c2</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">MAP_ARRAY</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
+
+    <span class="n">update_rooms</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
+    <span class="n">update_rooms</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
+
+
+<span class="n">update_rooms</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+<span class="n">new_map_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MAPS_PATH</span><span class="p">,</span> <span class="s1">&#39;sample.map&#39;</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">new_map_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">map_file</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">MAP_ARRAY</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+            <span class="n">map_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">map_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The <code>update_rooms</code> function is most interesting here. It goes through the whole tree. In our case operation we are using is called pre-order search. Inside this function we are updating <code>MAP_ARRAY</code> with data inside each node. The <code>room</code> attribute is not implemented yet. It should return a <code>Rect</code> object that holds information about position and size of the <code>room</code>. Also we are missing <code>is_leaf</code> function. Let's try implement those now.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># tree.py update</span>
+
+<span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_leaf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="ow">is</span> <span class="kc">None</span>
+
+
+<span class="k">class</span> <span class="nc">Rect</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_room</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">room</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_room</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_room</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_room</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_room</span>
+
+    <span class="k">def</span> <span class="nf">create_room</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">randint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">randint</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">Rect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+</code></pre></div>
+
+<p>Functions <code>room</code> and <code>is_leaf</code> are properties. If you are not familiar with Python property decorator then for now you should know that it allows to call method of the class without using parenthesis (check docs on <a href="https://docs.python.org/3/library/functions.html#property" target="_blank">python.org</a> for more informations).</p>
+<p>Let's try run this code and check the result! If you wish to see complete code for this stage go to my github <a href="https://github.com/tssan/rand2dmap" target="_blank">repository</a> and checkout to part1 tag (<code>git checkout tags/part1</code>). As always I'm creating simple <code>Makefile</code> for basic tasks.</p>
+<div class="highlight"><pre><span></span><code><span class="c"># Makefile</span>
+
+<span class="nv">ENV_PATH</span><span class="o">?=</span>.env
+<span class="nv">SRC_FULL_PATH</span><span class="o">?=</span><span class="k">$(</span>shell <span class="nb">pwd</span><span class="k">)</span>/src
+<span class="nv">TMP_MAPS_PATH</span><span class="o">?=</span>.maps
+
+
+<span class="nf">.PHONY</span><span class="o">:</span> <span class="n">env</span>-<span class="n">setup</span>
+<span class="nf">env-setup</span><span class="o">:</span>
+    @virtualenv -q -p python3 <span class="k">$(</span>ENV_PATH<span class="k">)</span><span class="p">;</span>
+    @mkdir -p <span class="k">$(</span>TMP_MAPS_PATH<span class="k">)</span>
+
+
+<span class="nf">.PHONY</span><span class="o">:</span> <span class="n">clean</span>-<span class="n">py</span>
+<span class="nf">clean-py</span><span class="o">:</span>
+    @find . -name <span class="s2">&quot;*.pyc&quot;</span> -exec rm -rf <span class="o">{}</span> <span class="se">\;</span> -prune -print
+    @find . -name <span class="s2">&quot;__pycache__&quot;</span> -exec rm -rf <span class="o">{}</span> <span class="se">\;</span> -prune -print
+
+
+<span class="nf">.PHONY</span><span class="o">:</span> <span class="n">clean</span>
+<span class="nf">clean</span><span class="o">:</span>
+    @rm -rf <span class="k">$(</span>ENV_PATH<span class="k">)</span>
+    @rm -rf <span class="k">$(</span>TMP_MAPS_PATH<span class="k">)</span>
+    @<span class="k">$(</span>MAKE<span class="k">)</span> clean-py
+
+
+<span class="nf">.PHONY</span><span class="o">:</span> <span class="n">run</span>
+<span class="nf">run</span><span class="o">:</span>
+    @. <span class="k">$(</span>ENV_PATH<span class="k">)</span>/bin/activate <span class="o">&amp;&amp;</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="k">$(</span>SRC_FULL_PATH<span class="k">)</span> python src/rand2dmap/generator.py
+</code></pre></div>
+
+<p>After you run <code>make env-setup</code> run you should have generated map in <code>.maps</code> folder. There is a chance that you get an exception <code>ValueError: empty range for randrange() (1,1, 0)</code>. It will occurs if in any <code>randint</code> arguments will have same values. It is an edge case that we will soon fix.</p>
+<h1>Map parameters and constraints</h1>
+<p>Let's take care of TODO list created at very beginning of this article. Starting with default options in generator.py:</p>
+<div class="highlight"><pre><span></span><code># generator.py
+
+import os
+
+<span class="gi">+ from rand2dmap.tree import (</span>
+<span class="gi">+     Rect,</span>
+<span class="gi">+     split_tree_of_rectangles,</span>
+<span class="gi">+     SplitRectangleError</span>
+<span class="gi">+ )</span>
+<span class="gi">+</span>
+<span class="gi">+ DEFAULT_OPTIONS = {</span>
+<span class="gi">+     &#39;padding&#39;: 1,</span>
+<span class="gi">+     &#39;min_wall_size&#39;: 2,</span>
+<span class="gi">+     &#39;min_walls_ratio&#39;: 0.4,</span>
+<span class="gi">+     &#39;min_area_percent&#39;: 0.3</span>
+<span class="gi">+ }</span>
+
+MAP_WIDTH = 100
+MAP_HEIGHT = 100
+
+<span class="gi">+ SPLITS = 5</span>
+
+MAPS_PATH = &#39;./.maps&#39;
+
+
+<span class="gi">+ wrap_rect = Rect(0, 0, MAP_WIDTH, MAP_HEIGHT, DEFAULT_OPTIONS)</span>
+<span class="gi">+ tree = None</span>
+<span class="gi">+ while tree is None:</span>
+<span class="gi">+     try:</span>
+<span class="gi">+         tree = split_tree_of_rectangles(wrap_rect, SPLITS, DEFAULT_OPTIONS)</span>
+<span class="gi">+     except SplitRectangleError:</span>
+<span class="gi">+         print(&#39;.&#39;, end=&#39;&#39;)</span>
+</code></pre></div>
+
+<p>I have created <code>SplitRectangleError</code> exception class. In case something goes wrong we will retry until tree instance is created.</p>
+<p>Adding modifications to the <code>Rect</code> class.</p>
+<div class="highlight"><pre><span></span><code>  class Rect:
+<span class="gi">+     def __init__(self, x, y, width, height, options):</span>
+          self.x = x
+          self.y = y
+          self.width = width
+          self.height = height
+<span class="gi">+         self.options = options</span>
+<span class="gi">+         self._area = None</span>
+          self._room = None
+
+<span class="gi">+     @property</span>
+<span class="gi">+     def area(self):</span>
+<span class="gi">+         if self._area is None:</span>
+<span class="gi">+             self._area = self.width * self.height</span>
+<span class="gi">+         return self._area</span>
+<span class="gi">+</span>
+      @property
+      def room(self):
+          if self._room is None:
+              self._room = self.create_room()
+          return self._room
+
+      def create_room(self):
+<span class="gi">+         padding = self.options[&#39;padding&#39;]</span>
+<span class="gi">+         min_wall_size = self.options[&#39;min_wall_size&#39;]</span>
+<span class="gi">+         min_walls_ratio = self.options[&#39;min_walls_ratio&#39;]</span>
+<span class="gi">+         min_area_percent = self.options[&#39;min_area_percent&#39;]</span>
+<span class="gi">+</span>
+<span class="gi">+         x = randint(self.x + padding, self.x + int(self.width / 2))</span>
+<span class="gi">+         y = randint(self.y + padding, self.y + int(self.height / 2))</span>
+<span class="gi">+</span>
+<span class="gi">+         width = randint(min_wall_size, self.x + self.width - x)</span>
+<span class="gi">+         height = randint(min_wall_size, self.y + self.height - y)</span>
+<span class="gi">+</span>
+<span class="gi">+         if (height / width &lt; min_walls_ratio or width / height &lt; min_walls_ratio or</span>
+<span class="gi">+                 width * height &lt; min_area_percent * self.area):</span>
+<span class="gi">+             return self.create_room()</span>
+<span class="gi">+</span>
+<span class="gi">+         return Rect(x, y, width, height, self.options)</span>
+</code></pre></div>
+
+<p>We must consider paddings while calculating room's position. If ratio of walls or area doesn't meet the conditions we return self function and try again.</p>
+<p>Splitting rectangles we should also consider padding, <code>min_wall_size</code> and <code>min_walls_ratio</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="gi">+ def split_rect(rect, options):</span>
+<span class="gi">+     padding = options[&#39;padding&#39;]</span>
+<span class="gi">+     min_wall_size = options[&#39;min_wall_size&#39;]</span>
+<span class="gi">+     min_walls_ratio = options[&#39;min_walls_ratio&#39;]</span>
+<span class="gi">+</span>
+<span class="gi">+     min_split_size = 2 * padding + min_wall_size</span>
+<span class="gi">+</span>
+<span class="gi">+     # we don&#39;t want to split too small reactangle</span>
+<span class="gi">+     if rect.width &lt; 2 * min_split_size or rect.height &lt; 2 * min_split_size:</span>
+<span class="gi">+         raise SplitRectangleError()</span>
+
+      if randint(0, 1) == 0:  # split vertical
+          r1 = Rect(
+              rect.x, rect.y,
+<span class="gi">+             randint(min_split_size, rect.width), rect.height,</span>
+<span class="gi">+             options</span>
+<span class="gi">+         )</span>
+          r2 = Rect(
+              rect.x + r1.width, rect.y,
+<span class="gi">+             rect.width - r1.width, rect.height,</span>
+<span class="gi">+             options</span>
+<span class="gi">+         )</span>
+<span class="gi">+</span>
+<span class="gi">+         # retry if ratio is too small</span>
+<span class="gi">+         if r1.width / r1.height &lt; min_walls_ratio or r2.width / r2.height &lt; min_walls_ratio:</span>
+<span class="gi">+             return split_rect(rect, options)</span>
+      else:  # split horizontal
+          r1 = Rect(
+              rect.x, rect.y,
+<span class="gi">+             rect.width, randint(min_split_size, rect.height),</span>
+<span class="gi">+             options</span>
+<span class="gi">+         )</span>
+          r2 = Rect(
+              rect.x, rect.y + r1.height,
+<span class="gi">+             rect.width, rect.height - r1.height,</span>
+<span class="gi">+             options</span>
+<span class="gi">+         )</span>
+<span class="gi">+</span>
+<span class="gi">+         # retry if ratio is too small</span>
+<span class="gi">+         if r1.height / r1.width &lt; min_walls_ratio or r2.height / r2.width &lt; min_walls_ratio:</span>
+<span class="gi">+             return split_rect(rect, options)</span>
+      return r1, r2
+</code></pre></div>
+
+<p>Don't forget to pass <code>options</code> inside <code>split_tree_of_rectangles</code> function. Checkout to part2 tag to see all changes we made.</p>
+<blockquote>
+<p>A padding was missing in create_room function. It is fixed in the repository.</p>
+</blockquote>
+<h1>Extras</h1>
+<p>It would be nice to see how generated map looks like other than in form of zeros and ones. For that task let's use <code>Pillow</code> package. Function will read <code>.map</code> file and put pixels in an array with color regarding the current value.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># preview.py</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+
+
+<span class="k">def</span> <span class="nf">rgb</span><span class="p">(</span><span class="n">tile_sign</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">tile_sign</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">118</span><span class="p">,</span> <span class="mi">165</span><span class="p">,</span> <span class="mi">204</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tile_sign</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">74</span><span class="p">,</span> <span class="mi">103</span><span class="p">,</span> <span class="mi">127</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tile_sign</span> <span class="o">==</span> <span class="s1">&#39;2&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">231</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">create_preview</span><span class="p">(</span><span class="n">mappath</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">img_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mappath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="n">img_data</span> <span class="o">=</span> <span class="n">img_data</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span>
+
+    <span class="n">im</span><span class="o">.</span><span class="n">putdata</span><span class="p">(</span><span class="n">img_data</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">width</span> <span class="o">*</span> <span class="n">zoom</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">height</span> <span class="o">*</span> <span class="n">zoom</span><span class="p">)),</span> <span class="n">Image</span><span class="o">.</span><span class="n">ANTIALIAS</span><span class="p">)</span>
+
+    <span class="n">head</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">mappath</span><span class="p">)</span>
+    <span class="n">new_img_path</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+    <span class="n">im</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">new_img_path</span><span class="p">)</span>
+</code></pre></div>
+
+<p><a class="small" href="/images/dung_1.png" target="_blank"><img alt="Map1" src="/images/dung_1.png"></a>
+<a class="small" href="/images/dung_2.png" target="_blank"><img alt="Map2" src="/images/dung_2.png"></a>
+<a class="small" href="/images/dung_3.png" target="_blank"><img alt="Map3" src="/images/dung_3.png"></a></p>
+<p>That is much better!</p>
+<p>I modified how the map is saved a little bit so script can save multiple maps. Check how it's done in the repository.</p>
+<h1>Summary</h1>
+<p>Ok! The generator is done. This is certainly not an optimal way to generate that kind of map but it is good enough. There is a <code>RecursionError: maximum recursion depth exceeded while calling a Python object</code> problem that should be handled. Depends on constraints setup it occurs more or less often. I plan to write an article about how to use generated maps (probably in a game level design or other game development subject).</p>
+<p>Thanks for reading and please leave any comment below. Cheers!</p></div><!-- /.entry-content -->
+
+    <footer class="post-info">
+        <div class="published">Tue 30 October 2018</div>
+
+
+        <div class="author">
+            By: tssan        </div>
+
+        <div class="category">Category: <a href="/category/programming.html">programming</a>
+        </div>
+
+        <div class="tags">Tags: <a href="/tag/gamedev.html">gamedev</a><a href="/tag/python.html">python</a>        </div>
+
+        <div class="copy">dojoit.pl © 2021</div>
+    </footer><!-- /.post-info -->
+</div>
+  </div>
+</div>
+
+<script type="text/javascript" src="/theme/js/blog.js"></script>
+</body>
+</html>
