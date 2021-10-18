@@ -1,0 +1,16 @@
+{
+    "name": "dojoit.pl",
+    "short_name": "dojoit",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#262626",
+    "theme_color": "#262626",
+    "description": "DojoIT - blog about programming",
+    "icons": [
+        {
+            "src": "images/logo144.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        }
+    ]
+}

@@ -1,0 +1,587 @@
+:root {
+    /* colors */
+
+    /* CSS HEX */
+    --primary: #E8E9F3;
+    --secondary: #DD6E42;
+    --accent1: #F0CF65;
+    --accent1a: rgba(240, 207, 101, 0.9);
+    --accent2: #1A1B41;
+    --accent3: #3D5A80;
+    --accent3v1: #5D7Aa0;
+    --accent4: #293241;
+    --accent5: #5B8E7D;
+    --accent5v1: #7BaE9D;
+
+    /* THEME CURRENT */
+    --semi-white: #bbddbb;
+    --semi-black: #262626;
+    --gray1: #363636;
+    --gray2: #666666;
+
+    /* dimensions */
+    --small-space: 0.5rem;
+    --base-space: 1rem;
+}
+
+@font-face {
+    font-family: ShareTechMono;
+    src:
+        local('ShareTechMono'),
+        local('Share Tech Mono'),
+        url('../fonts/ShareTechMono-Regular.ttf');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: ShareTechMono, monospace;
+}
+
+a,
+a:visited,
+a:hover {
+    text-decoration: none;
+    color: var(--accent3);
+}
+
+html {
+    height: 100%;
+}
+body {
+    height: 100%;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--semi-white);
+    background-color: var(--semi-black);
+}
+.body-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+header.main {
+    width: 100%;
+    background-color: var(--gray1);
+    align-self: center;
+    text-align: center;
+    padding: var(--base-space);
+    box-shadow: 0px -3px 10px var(--semi-black);
+}
+header.main a {
+    text-shadow: 0px 1px 3px var(--secondary);
+    color: var(--secondary);
+    font-family: ShareTechMono;
+    font-size: 3.5rem;
+}
+header.main img {
+    vertical-align: middle;
+    width: 90px;
+    margin-right: var(--base-space);
+}
+
+nav.main {
+    font-size: 1.5rem;
+    background-color: var(--semi-black);
+    border-top: 1px solid var(--semi-black);
+    box-shadow: 0px 1px 1px var(--accent1);
+}
+nav.main ul {
+    list-style: none;
+    display: flex;
+}
+nav.main ul li {
+    display: block;
+}
+nav.main a {
+    padding: var(--base-space);
+    display: inline-block;
+    color: var(--accent1);
+    text-transform: uppercase;
+}
+nav.main a:hover {
+    background-color: var(--gray1);
+    color: var(--semi-white);
+}
+nav.main li.inlines {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#content {
+    padding: var(--base-space);
+}
+
+#index-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+#index-wrapper #post-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+#index-wrapper #post-list a {
+    color: var(--secondary);
+}
+#index-wrapper #post-list li {
+    padding: var(--base-space);
+    padding-top: var(--small-space);
+    margin-bottom: var(--base-space);
+    border-left: 3px solid var(--secondary);
+    border-bottom: 1px solid var(--secondary);
+}
+#index-wrapper #post-list li:hover {
+    background-color: var(--accent4);
+}
+#index-wrapper #post-list li header {
+    padding-bottom: var(--small-space);
+}
+#index-wrapper #post-list li time.published {
+    font-size: 0.9rem;
+    color: var(--secondary);
+}
+#index-wrapper .tags {
+    padding: var(--base-space);
+    list-style: none;
+    flex-shrink: 1;
+    text-align: center;
+}
+#index-wrapper .tags li {
+    font-size: 1.2rem;
+    display: inline-block;
+    padding: var(--small-space);
+}
+#index-wrapper .tags li a {
+    color: var(--accent1);
+}
+
+#category-wrapper h1 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+#category-wrapper ul {
+    margin: var(--base-space);
+}
+#category-wrapper li {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+#tag-wrapper h1 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+#tag-wrapper ul {
+    margin: var(--base-space);
+}
+#tag-wrapper li {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.last-updated {
+    font-size: 0.7rem;
+}
+
+#content > h1,
+#content > h2,
+#content > h3,
+#content > h4,
+#content > h5 ,
+#content > p {
+    padding: 10px var(--base-space);
+}
+
+footer.index {
+    border-top: 1px solid black;
+    padding: var(--base-space);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/**************************** ARTICLE PAGE ****************************/
+
+#article header {
+    color: var(--accent3v1);
+    margin-bottom: var(--base-space);
+}
+
+#article header h1 {
+    font-size: 2rem;
+}
+#article header h2 {
+    font-size: 1rem;
+    color: var(--accent3);
+}
+
+#article .content h1,
+#article .content h2,
+#article .content h3 {
+    color: var(--secondary);
+}
+#article .content h1,
+#article .content p {
+    line-height: 1.5rem;
+    margin: var(--base-space) 0;
+}
+
+#article .content blockquote {
+    border-left: 5px solid var(--accent5v1);
+    padding: 0 15px;
+    margin: 10px 0;
+    background-color: var(--accent4);
+    color: var(--accent5);
+}
+#article .content blockquote p::before {
+    content: 'NOTE:';
+    display: inline-block;
+    font-weight: bold;
+    color: var(--accent5v1);
+    padding-right: 5px;
+}
+#article .content blockquote p {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+#article ul,
+#article ol {
+    margin: var(--small-space) var(--base-space);
+}
+#article ol li {
+    line-height: 1.5rem;
+    margin-left: var(--base-space);
+}
+
+#article .content h1 {
+    font-size: 1.3rem;
+}
+
+#article .content img {
+    max-width: 50%;
+    border: 3px solid var(--gray2);
+    margin: var(--base-space) 0;
+}
+#article .content a.small img {
+    max-width: 30%;
+}
+
+#article footer {
+    font-size: 0.8rem;
+    border-top: 1px dotted var(--gray1);
+    padding: var(--base-space) 0;
+    display: flex;
+    color: var(--gray2);
+    flex-wrap: wrap;
+}
+#article footer .published,
+#article footer .author,
+#article footer .category,
+#article footer .tags {
+    width: 50%;
+    padding-bottom: 5px;
+}
+#article footer .copy {
+    padding-top: 5px;
+    width: 100%;
+    text-align: center;
+}
+#article footer .tags a {
+    display: inline-block;
+    padding: 2px;
+}
+
+@media (min-width: 800px) {
+    #article .content {
+        max-width: 65%;
+    }
+}
+
+/**************************** ARTICLE PAGE - end ****************************/
+
+/* MARKDOWN CODE BLOCKS */
+
+.highlight {
+    overflow-x: auto;
+    background-color: var(--gray1);
+    padding: var(--base-space);
+}
+.highlight pre code,
+li > code,
+p > code {
+    color: var(--secondary);
+}
+
+/* MARKDOWN CODE BLOCKS - end */
+
+/**************************** PAGES ****************************/
+
+/** CV **/
+#cv-wrapper {
+    overflow-x: hidden;
+}
+
+#cv-wrapper section {
+    padding: var(--base-space);
+}
+#cv-wrapper section h2 {
+    text-align: center;
+}
+
+/* CV Expirience */
+.cv-expirience .event {
+    padding-top: var(--base-space);
+}
+.cv-expirience .event::before {
+    display: block;
+    padding: var(--base-space);
+    content: attr(data-caption);
+    text-align: right;
+    color: var(--semi-white);
+    font-size: 1rem;
+    font-weight: bold;
+    border-bottom: 4px solid var(--secondary);
+    margin-bottom: var(--base-space);
+}
+.cv-expirience .event h3 {
+    color: var(--secondary);
+}
+.cv-expirience .event .content {
+    padding: var(--base-space);
+}
+.cv-expirience .event .content span.caption {
+    font-weight: bold;
+    line-height: 1.5rem;
+    padding-bottom: 5px;
+}
+.cv-expirience .event .content ul {
+    font-weight: normal;
+    padding: calc(var(--base-space) / 2);
+    line-height: 1.4rem;
+}
+.cv-expirience .event .content ul li {
+    margin-left: 6px;
+}
+
+
+@media (min-width: 800px) {
+    .cv-expirience {
+        position: relative;
+        margin: 0 auto;
+    }
+    .cv-expirience::after {
+        display: block;
+        content: '';
+        position: absolute;
+        width: 4px;
+        background-color: var(--secondary);
+        top: 0;
+        bottom: 0;
+        left: 30%;
+        margin-left: 0px;
+    }
+    .cv-expirience .event {
+        position: relative;
+        padding-left: calc(var(--base-space) * 2);
+    }
+    .cv-expirience .event::before {
+        display: inline;
+        padding: 0;
+        content: '';
+    }
+    .cv-expirience .event::after {
+        padding: var(--base-space);
+        content: attr(data-caption);
+        position: absolute;
+        top: 0;
+        right: 70%;
+        text-align: right;
+        color: var(--semi-white);
+        border: 4px solid var(--secondary);
+        border-right: none;
+        font-size: 1rem;
+        font-weight: bold;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+    .cv-expirience .event h3,
+    .cv-expirience .event .content {
+        position: relative;
+        left: 30%;
+    }
+    .cv-expirience .event .content ul {
+        font-weight: normal;
+    }
+}
+
+/* CV Education */
+.cv-education .event {
+    padding-top: var(--base-space);
+}
+.cv-education .event::before {
+    display: block;
+    padding: var(--base-space);
+    content: attr(data-caption);
+    text-align: right;
+    color: var(--semi-white);
+    font-size: 1rem;
+    font-weight: bold;
+    border-bottom: 4px solid var(--accent3);
+    margin-bottom: var(--base-space);
+}
+.cv-education .event h3 {
+    color: var(--accent3v1);
+}
+.cv-education .event .content {
+    padding: var(--base-space);
+}
+.cv-education .event .content span.caption {
+    font-weight: bold;
+    line-height: 1.5rem;
+    padding-bottom: 5px;
+}
+.cv-education .event .content ul {
+    font-weight: normal;
+    padding: calc(var(--base-space) / 2);
+    line-height: 1.4rem;
+}
+.cv-education .event .content ul li {
+    margin-left: 6px;
+}
+
+
+@media (min-width: 800px) {
+    .cv-education {
+        position: relative;
+        margin: 0 auto;
+    }
+    .cv-education::after {
+        display: block;
+        content: '';
+        position: absolute;
+        width: 4px;
+        background-color: var(--accent3);
+        top: 0;
+        bottom: 0;
+        left: 30%;
+        margin-left: 0px;
+    }
+    .cv-education .event {
+        position: relative;
+        padding-left: calc(var(--base-space) * 2);
+    }
+    .cv-education .event::before {
+        display: inline;
+        padding: 0;
+        content: '';
+    }
+    .cv-education .event::after {
+        padding: var(--base-space);
+        content: attr(data-caption);
+        position: absolute;
+        top: 0;
+        right: 70%;
+        text-align: right;
+        color: var(--semi-white);
+        border: 4px solid var(--accent3);
+        border-right: none;
+        font-size: 1rem;
+        font-weight: bold;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+    .cv-education .event h3,
+    .cv-education .event .content {
+        position: relative;
+        left: 30%;
+    }
+    .cv-education .event .content ul {
+        font-weight: normal;
+    }
+}
+
+/* CV Skills */
+.cv-skills {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.cv-skills .event {
+    width: 100%;
+    padding-top: var(--base-space);
+}
+.cv-skills .event h3 {
+    text-align: left;
+    color: var(--accent5);
+}
+.cv-skills .event .content {
+    margin: 0 auto;
+    padding: var(--base-space);
+}
+.cv-skills .event .content .tags span {
+    display: inline-block;
+    padding: 4px 6px;
+    margin: 4px;
+    border-radius: 5px;
+}
+.cv-skills .event .content .tags.skills-langs span {
+    border: 2px solid var(--secondary);
+}
+.cv-skills .event .content .tags.skills-os span {
+    border: 2px solid var(--accent3);
+}
+.cv-skills .event .content .tags.skills-tools span {
+    border: 2px solid var(--accent1);
+}
+.cv-skills .event .content .tags.skills-devops span {
+    border: 2px solid var(--accent5);
+}
+.cv-skills .event .content span.caption {
+    font-weight: bold;
+    line-height: 1.5rem;
+    padding-bottom: 5px;
+}
+
+@media (min-width: 800px) {
+    .cv-skills .event {
+        width: initial;
+        min-width: 50%;
+    }
+}
+
+/* CV Other */
+.cv-other {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.cv-other .event {
+    width: 100%;
+    padding-top: var(--base-space);
+}
+.cv-other .event .content {
+    margin: 0 auto;
+    padding: var(--base-space);
+}
+.cv-other .event .content span.caption {
+    font-weight: bold;
+    line-height: 1.5rem;
+    padding-bottom: 5px;
+}
+
+@media (min-width: 800px) {
+    .cv-other .event {
+        width: initial;
+        min-width: 50%;
+    }
+}
+
+/** CV - end **/
+
+/**************************** PAGES -end ****************************/
