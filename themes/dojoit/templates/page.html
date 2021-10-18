@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ page.title }}</h1>
+    {% if page.subtitle %}<h2>{{ page.subtitle }}</h2>{% endif %}
+
+    {{ page.content }}
+
+    {% if page.modified %}
+        <p class="last-updated">
+        Last updated: {{ page.locale_modified }}
+        </p>
+    {% endif %}
+{% endblock %}

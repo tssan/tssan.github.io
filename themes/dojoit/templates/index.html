@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div id="index-wrapper">
+  <ul id="post-list">
+  {% for article in articles_page.object_list %}
+    <li><article class="hentry">
+          <header> <h2 class="entry-title"><a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark" title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a></h2> </header>
+          <footer class="post-info">
+              <time class="published" datetime="{{ article.date.isoformat() }}"> {{ article.locale_date }} </time>
+          </footer><!-- /.post-info -->
+          <div class="entry-content"> {{ article.summary }} </div><!-- /.entry-content -->
+    </article></li>
+  {% endfor %}
+  </ul><!-- /#posts-list -->
+
+  <ul class="tags">
+    {% for tag, articles in tags|sort %}
+        <li><a href="{{ SITEURL }}/{{ tag.url }}">{{ tag }}</a> ({{ articles|count }})</li>
+    {% endfor %}
+  </ul>
+</div>
+
+<footer class="index">
+  dojoit.pl © 2021
+</footer>
+
+{% endblock %}

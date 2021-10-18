@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div id="tag-wrapper">
+    <h1>Articles tagged with {{ tag }}:</h1>
+    <ul id="post-list">
+        {% for article in articles_page.object_list %}
+            <li><a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark" title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a></li>
+        {% endfor %}
+    </ul><!-- /#posts-list -->
+</div>
+
+<footer class="index">dojoit.pl © 2021</footer>
+
+{% endblock %}
