@@ -57,6 +57,7 @@ body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: var(--semi-white);
     background-color: var(--semi-black);
+    font-size: 18px;
 }
 .body-wrapper {
     display: flex;
@@ -325,6 +326,7 @@ p > code {
 /** CV **/
 #cv-wrapper {
     overflow-x: hidden;
+    position: relative;
 }
 
 #cv-wrapper section {
@@ -332,6 +334,26 @@ p > code {
 }
 #cv-wrapper section h2 {
     text-align: center;
+}
+
+#download-cv-pdf-btn {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    padding: var(--small-space);
+    color: var(--primary);
+    cursor: pointer;
+    display: block;
+    border: 1px solid var(--accent5);
+    background-color: var(--accent4);
+    font-size: 1.2rem;
+    z-index: 99999;
+}
+#download-cv-pdf-btn:hover {
+    color: var(--accent1);
+}
+#download-cv-pdf-btn:active {
+    color: var(--secondary);
 }
 
 /* CV Expirience */

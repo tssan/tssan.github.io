@@ -10,6 +10,9 @@
 
     <link rel="stylesheet" type="text/css" href="/theme/css/blog.css"/>
     <link rel="stylesheet" type="text/css" href="/theme/vendors/fontawesome/css/all.min.css"/>
+
+        <script type="text/javascript" src="/theme/vendors/jspdf.umd.min.js"></script>
+        <script type="text/javascript" src="/theme/vendors/canvg.umd.js"></script>
 </head>
 <body>
 
@@ -34,6 +37,7 @@
     
 
 <div id="cv-wrapper">
+<button id="download-cv-pdf-btn"><i class="fas fa-file-download"></i></button>
 <section>
     <h2>Expirience</h2>
     <div class="cv-expirience">
@@ -45,7 +49,7 @@
                         <li>
                             <h4>SPECTRA-IT SP. Z O.O. SP.K.</h4>
                             <ul>
-                                <li>Migrating legacy code to new environemnt.</li>
+                                <li>Migration of legacy Python backend to new environemnt.</li>
                             </ul>
                         </li>
                         <li><h4>RedGreenBlue</h4>
@@ -59,7 +63,6 @@
                             <ul>
                                 <li>Chess Puzzle application - Django/ReactJS</li>
                                 <li>Cryptocurrency - Binance client in Python</li>
-                                <li>Cryptocurrency - Solidity Course</li>
                                 <li>Writing programming blog dojoit.pl</li>
                             </ul>
                         </li>
@@ -168,7 +171,6 @@
             <div class="content">
                 <div><span class="caption">Faculty of Computer Science</span></div>
                 <div><span class="caption">Specialization:</span> Programming</div>
-                <div><span class="caption">Master of Science</span></div>
             </div>
         </div>
     </div>
@@ -182,13 +184,14 @@
             <div class="content" data-caption="">
                 <div class="tags skills-langs"><span>Python</span><span>Javascript</span></div>
                 <div class="tags skills-os"><span>Linux</span><span>OSX</span><span>Windows</span></div>
-                <div class="tags skills-tools"><span>Django</span><span>ReactJS</span><span>Bash</span><script></script><span>HTML & CSS</span><span>Git</span><span>Postgresql</span><span>RESTful APIs</span></div>
+                <div class="tags skills-tools"><span>Django</span><span>ReactJS</span><span>Bash</span><script></script><span>HTML & CSS</span><span>Git</span><span>PostgreSQL</span><span>RESTful APIs</span></div>
                 <div class="tags skills-devops"><span>Fabric</span><span>Ansible</span><span>Docker</span><span>Pulumi</span></div>
             </div>
         </div>
         <div class="event">
             <h3>Courses</h3>
             <ul class="content" data-caption="">
+                <li><span class="caption">Ethereum and Solidity: The Complete Developer's Guide</li>
                 <li><span class="caption">AWS Technical Essentials</span></li>
                 <li><span class="caption">Photoshop:</span> certified basic knowledge</li>
             </ul>
@@ -210,6 +213,409 @@
 
 </div>
 
+<script type="text/javascript">
+    const EXPIRIENCE = [
+        {
+            date: "02.2021 to present",
+            caption: "Freelance Programmer",
+            items: [
+                {
+                    caption: "SPECTRA-IT SP. Z O.O. SP.K.",
+                    items: [
+                        "Migration of legacy Python backend to new environemnt."
+                    ]
+                },
+                {
+                    caption: "RedGreenBlue",
+                    items: [
+                        "Django backend for Roof Optimization App",
+                        "Generating PDF using jsPDF library",
+                        "Data migration with Django and PostgreSQL"
+                    ]
+                },
+                {
+                    caption: "Private projects",
+                    items: [
+                        "Chess Puzzle application - Django/ReactJS",
+                        "Cryptocurrency - Binance client in Python",
+                        "Writing programming blog dojoit.pl"
+                    ]
+                }
+            ]
+        },
+        {
+            date: "08.2020 - 01.2021",
+            caption: "BlockFi",
+            roles: ["Infrastructure Engineer"],
+            items: [
+                "Implementing infrastructure using Pulumi (Python)",
+                "Testing stacks created in Pulumi on AWS"
+            ]
+        },
+        {
+            date: "01.2016 - 07.2020",
+            caption: "Milenium-IT",
+            roles: ["Programmer", "Software Engineer", "DevOps Engineer"],
+            items: [
+                "Developing and designing web applications using Django and Javascript (ReactJS)",
+                "Maintaining existing applications",
+                "Automation of deployment process to AWS",
+                "Creating development and test environments using Proxmox"
+            ]
+        },
+        {
+            date: "04.2014 - 12.2015",
+            caption: "Ubiquiti Networks",
+            roles: ["Programmer"],
+            items: [
+                "Developing and designing web applications using Django"
+            ]
+        },
+        {
+            date: "04.2010 - 03.2014",
+            caption: "Milenium-IT",
+            roles: ["Programmer"],
+            items: [
+                "Developing and designing web applications using Django",
+                "Maintaining existing applications"
+            ]
+        },
+        {
+            date: "01.2010 - 03.2010",
+            caption: "Mobile-Tech Krakow",
+            roles: ["Programmer"],
+            items: [
+                "Maintaining existing applications (PHP)",
+                "Testing PHP applications"
+            ]
+        },
+        {
+            date: "04.2008 - 11.2008",
+            caption: "ARTPlus Sp. z o.o. Krakow",
+            roles: ["Programmer"],
+            items: [
+                "Maintaining existing applications (PHP)",
+                "Usting HTML, Javascript and CSS to bring concepts to life"
+            ]
+        }
+    ];
+
+    const EDUCATION = [
+        {
+            date: "2009 - 2012",
+            school: "University of Information Technology and Management in Rzeszow",
+            faculty: "Faculty of Information Technology",
+            specialization: "Specialization: Software Engineering Technologies",
+            degree: "Master of Science",
+        },
+        {
+            date: "2006 - 2009",
+            school: "WSE Kraków - Tischner European University",
+            faculty: "Faculty of Computer Science",
+            specialization: "Specialization: Programming",
+        }
+    ];
+
+    const SKILLS = {
+        langs: ["Python", "Javascript"],
+        os: ["Linux", "OSX", "Windows"],
+        tools: ["Django", "ReactJS", "Bash", "HTML & CSS", "Git", "PostgreSQL", "RESTful APIs"],
+        devops: ["Fabric", "Ansible", "Docker", "Pulumi"]
+    };
+
+    const COURSES = [
+        "Ethereum and Solidity: The Complete Developer's Guide",
+        "AWS Technical Essentials",
+        "Photoshop: certified basic knowledge"
+    ];
+
+    const INTERESTS = [
+        "Cycling", "Reading", "Crypto", "Gamedev", "Boardgames", "Chess"
+    ];
+
+    const getTextWidth = (doc, txt) => {
+        return doc.getStringUnitWidth(txt) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+    }
+
+    const handlePDFGeneration = () => {
+        const btn = document.getElementById("download-cv-pdf-btn");
+
+        if(btn !== null) {
+            const PADDING = 5;
+            const DEFAULT_FONT_SIZE = 8;
+            const MARGIN_LEFT = 5;
+            const MARGIN_LEFT2 = MARGIN_LEFT + 60;  // +left side width;
+            const COLOR1 = "#262626";
+            const COLOR2 = "#e6e6e6";
+            const COLOR3 = "#dd6e42";
+            const COLOR4 = "#f0cf65";
+            const COLOR5 = "#363636";
+            const COLOR6 = "#5d7aa0";
+            const COLOR7 = "#7bae9d";
+
+            btn.addEventListener("click", (e) => {
+                const now = new Date();
+                const todayStr = now.toISOString().split('T')[0];
+                const doc = window.jspdf.jsPDF();
+
+                const pageX = doc.internal.pageSize.width;
+                const pageY = doc.internal.pageSize.height;
+
+                doc.addFont('/theme/fonts/Roboto-Bold.ttf', 'RobotoB', 'normal');
+                doc.addFont('/theme/fonts/Roboto-Regular.ttf', 'Roboto', 'normal');
+                doc.addFont('/theme/fonts/ShareTechMono-Regular.ttf', 'ShareTechMono', 'normal');
+
+                doc.setFontSize(DEFAULT_FONT_SIZE);
+
+                doc.addImage('/images/mecv.jpg', 'JPEG', 0, 0, 60, 65.2);
+
+                doc.setDrawColor(COLOR3);
+                doc.setLineWidth(0.3);
+                doc.line(0, 65.2, 60, 65.2, 'S');
+
+                let currentHeight = 65.2;
+
+                // Name
+                doc.rect(0, 65.3, 60, 30.8, 'F');
+                doc.setTextColor(COLOR4);
+                doc.setFontSize(DEFAULT_FONT_SIZE * 2);
+                currentHeight += 10;
+                doc.setFont("RobotoB");
+                doc.text("Piotr", MARGIN_LEFT, currentHeight)
+                currentHeight += 6;
+                doc.text("Karasiński", MARGIN_LEFT, currentHeight)
+                doc.setFontSize(DEFAULT_FONT_SIZE * 1.5);
+                currentHeight += 8;
+                doc.setTextColor(COLOR3);
+                doc.setFont("ShareTechMono");
+                // doc.setFont("Roboto");
+                doc.text("Software Developer", MARGIN_LEFT, currentHeight);
+
+                // About
+                doc.setFont("Roboto");
+                doc.setFillColor(COLOR5);
+                doc.rect(0, 95, 60, pageY - 95, 'F');
+                doc.setTextColor(COLOR2);
+
+                currentHeight += 15;
+                doc.setFontSize(DEFAULT_FONT_SIZE * 1.5);
+                doc.setFont("ShareTechMono");
+                doc.text("Personal Info:", MARGIN_LEFT, currentHeight);
+
+                currentHeight += 6;
+                doc.setFont("Roboto");
+                doc.setFontSize(DEFAULT_FONT_SIZE);
+                doc.addImage('/images/map-marker-alt-solid.png', 'PNG', MARGIN_LEFT, currentHeight, 3, 4);
+                currentHeight += 3;
+                doc.text("Kraków, Poland", MARGIN_LEFT + 5, currentHeight);
+
+                currentHeight += 6;
+                doc.addImage('/images/mobile-alt-solid.png', 'PNG', MARGIN_LEFT, currentHeight, 3, 4);
+                currentHeight += 3;
+                doc.text("+48 665 666 833", MARGIN_LEFT + 5, currentHeight);
+
+                currentHeight += 6;
+                doc.addImage('/images/at-solid.png', 'PNG', MARGIN_LEFT, currentHeight, 3, 3);
+                currentHeight += 2;
+                doc.text("piotr@dojoit.pl", MARGIN_LEFT + 5, currentHeight);
+
+                currentHeight += 10;
+                doc.line(0 + PADDING, currentHeight, 60 - PADDING, currentHeight);
+                currentHeight += 10;
+
+                // Languages
+                doc.setFontSize(DEFAULT_FONT_SIZE * 1.5);
+                doc.setFont("ShareTechMono");
+                doc.text("Languages:", MARGIN_LEFT, currentHeight);
+
+                currentHeight += 10;
+                doc.setFont("Roboto");
+                doc.setFontSize(DEFAULT_FONT_SIZE);
+                doc.text("Native: Polish", MARGIN_LEFT, currentHeight)
+                currentHeight += 6;
+                doc.text("Advanced: English", MARGIN_LEFT, currentHeight);
+
+                currentHeight += 10;
+                doc.line(0 + PADDING, currentHeight, 60 - PADDING, currentHeight);
+                currentHeight += 10;
+
+                // Skills
+                doc.setFontSize(DEFAULT_FONT_SIZE * 1.5);
+                doc.setFont("ShareTechMono");
+                doc.text("Skills & Tech:", MARGIN_LEFT, currentHeight);
+                currentHeight += 10;
+
+                doc.setFont("RobotoB");
+                doc.setFontSize(DEFAULT_FONT_SIZE);
+
+                const drawSkill = (skillsList, color) => {
+                    doc.setTextColor(color);
+                    let posX = MARGIN_LEFT;
+                    for(const l of skillsList) {
+                        let txt = ` ${l} `;
+                        const txtLen = getTextWidth(doc, txt) + 1;
+                        if(posX >= 60 - PADDING - txtLen) {
+                            posX = MARGIN_LEFT;
+                            currentHeight += 6;
+                        }
+                        doc.text(txt, posX, currentHeight);
+                        posX += txtLen;
+                    }
+                    currentHeight += 6;
+                }
+                drawSkill(SKILLS.langs, COLOR3);
+                drawSkill(SKILLS.os, COLOR6);
+                drawSkill(SKILLS.tools, COLOR4);
+                drawSkill(SKILLS.devops, COLOR7);
+
+                currentHeight += 4;
+                doc.line(0 + PADDING, currentHeight, 60 - PADDING, currentHeight);
+                currentHeight += 10;
+
+                // Interests
+                doc.setTextColor(COLOR2);
+                doc.setFontSize(DEFAULT_FONT_SIZE * 1.5);
+                doc.setFont("ShareTechMono");
+                doc.text("Interests:", MARGIN_LEFT, currentHeight);
+                currentHeight += 10;
+
+                doc.setFont("Roboto");
+                doc.setFontSize(DEFAULT_FONT_SIZE);
+                drawSkill(INTERESTS, COLOR2);
+
+                // Education
+                currentHeight = 10;
+                doc.setFontSize(DEFAULT_FONT_SIZE * 2);
+                doc.setFont("ShareTechMono");
+                doc.setTextColor(COLOR3);
+                doc.text("EDUCATION", MARGIN_LEFT2, currentHeight);
+                currentHeight += 3;
+                doc.line(MARGIN_LEFT2, currentHeight, pageX - MARGIN_LEFT, currentHeight);
+                currentHeight += 8;
+
+                doc.setFont("Roboto");
+                doc.setFontSize(DEFAULT_FONT_SIZE);
+                doc.setTextColor(COLOR1);
+
+                const TIMELINE_COL1_WIDTH = 30;
+
+                let idx = 0;
+                for(const edu of EDUCATION) {
+                    doc.setFontSize(DEFAULT_FONT_SIZE);
+                    doc.setFont("RobotoB");
+                    doc.text(edu.date, MARGIN_LEFT2, currentHeight);
+                    doc.text(edu.school, MARGIN_LEFT2 + TIMELINE_COL1_WIDTH, currentHeight);
+                    doc.setFontSize(DEFAULT_FONT_SIZE * 0.95);
+                    currentHeight += 3.5;
+                    doc.setFont("Roboto");
+                    doc.text(edu.faculty, MARGIN_LEFT2 + TIMELINE_COL1_WIDTH, currentHeight);
+                    currentHeight += 3.5;
+                    doc.text(edu.specialization, MARGIN_LEFT2 +TIMELINE_COL1_WIDTH, currentHeight);
+                    if(edu.degree !== undefined) {
+                        currentHeight += 3.5;
+                        doc.text(edu.degree, MARGIN_LEFT2 + TIMELINE_COL1_WIDTH, currentHeight);
+                    }
+                    idx++;
+                    if(idx < Object.keys(EDUCATION).length) {
+                        currentHeight += 5;
+                    }
+                }
+
+                currentHeight += 15;
+                // Expirience
+                doc.setFontSize(DEFAULT_FONT_SIZE * 2);
+                doc.setFont("ShareTechMono");
+                doc.setTextColor(COLOR3);
+                doc.text("EXPIRIENCE", MARGIN_LEFT2, currentHeight);
+                currentHeight += 3.5;
+                doc.line(MARGIN_LEFT2, currentHeight, pageX - MARGIN_LEFT, currentHeight);
+                currentHeight += 8;
+
+                doc.setFont("Roboto");
+                doc.setFontSize(DEFAULT_FONT_SIZE);
+                doc.setTextColor(COLOR1);
+
+                idx = 0;
+                for(const exp of EXPIRIENCE) {
+                    doc.setFontSize(DEFAULT_FONT_SIZE);
+                    doc.setFont("RobotoB");
+                    doc.text(exp.date, MARGIN_LEFT2, currentHeight);
+                    doc.text(exp.caption, MARGIN_LEFT2 + TIMELINE_COL1_WIDTH, currentHeight);
+                    currentHeight += 3.5;
+                    doc.setFontSize(DEFAULT_FONT_SIZE * 0.95);
+                    doc.setFont("Roboto");
+
+                    if(exp.roles !== undefined) {
+                        if(exp.roles.length > 1) {
+                            doc.text(`Roles: ${exp.roles.join(", ")}`, MARGIN_LEFT2 + TIMELINE_COL1_WIDTH, currentHeight);
+                        } else {
+                            doc.text(`Role: ${exp.roles}`, MARGIN_LEFT2 + TIMELINE_COL1_WIDTH, currentHeight);
+                        }
+                        currentHeight += 3.5;
+                    }
+
+                    if(typeof(exp.items[0]) === "string") {
+                        doc.text("Responsibilities:", MARGIN_LEFT2 + TIMELINE_COL1_WIDTH, currentHeight);
+                        currentHeight += 3.5;
+                        for(const r of exp.items) {
+                            doc.text(`• ${r}`, MARGIN_LEFT2 + 30, currentHeight);
+                            currentHeight += 3.5;
+                        }
+                    } else {
+                        for(const item of exp.items) {
+                            currentHeight += 3.5;
+                            doc.setFont("RobotoB");
+                            doc.text(item.caption, MARGIN_LEFT2 + TIMELINE_COL1_WIDTH, currentHeight);
+                            currentHeight += 3.5;
+                            doc.setFont("Roboto");
+                            for(const r of item.items) {
+                                doc.text(`• ${r}`, MARGIN_LEFT2 + 30, currentHeight);
+                                currentHeight += 3.5;
+                            }
+                        }
+                    }
+
+                    idx++;
+                    if(idx < Object.keys(EXPIRIENCE).length) {
+                        currentHeight += 4;
+                    }
+                }
+
+                currentHeight += 10;
+                // Courses
+                doc.setFontSize(DEFAULT_FONT_SIZE * 2);
+                doc.setFont("ShareTechMono");
+                doc.setTextColor(COLOR3);
+                doc.text("COURSES", MARGIN_LEFT2, currentHeight);
+                currentHeight += 3.5;
+                doc.line(MARGIN_LEFT2, currentHeight, pageX - MARGIN_LEFT, currentHeight);
+                currentHeight += 8;
+
+                doc.setFont("Roboto");
+                doc.setFontSize(DEFAULT_FONT_SIZE);
+                doc.setTextColor(COLOR1);
+
+                for(const course of COURSES){
+                    doc.text(`• ${course}`, MARGIN_LEFT2, currentHeight);
+                    currentHeight += 4;
+                }
+
+                // update date
+
+                doc.setFont("Roboto");
+                doc.setFontSize(DEFAULT_FONT_SIZE * 0.8);
+                doc.setTextColor(COLOR2);
+                doc.text(`dojoit.pl ${todayStr}`, PADDING, pageY - PADDING);
+                // save pdf
+                doc.save(`PiotrKarasinskiCV-${todayStr}.pdf`);
+            });
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", (event) => {
+        handlePDFGeneration();
+    });
+</script>
 
 
         <p class="last-updated">
