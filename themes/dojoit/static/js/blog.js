@@ -8,7 +8,27 @@ async function registerSW() {
     }
 }
 
+const handleSpinner = () => {
+    const spinner = document.getElementById('spinner');
+
+    spinner.addEventListener('click', e => {
+        spinner.style.display = 'none';
+    });
+}
+
+const showSpinner = () => {
+    const spinner = document.getElementById('spinner');
+    spinner.style.display = 'block';
+}
+const hideSpinner = () => {
+    const spinner = document.getElementById('spinner');
+    spinner.style.display = 'none';
+}
+
 document.addEventListener("DOMContentLoaded", (event) => {
+    // spinner
+    handleSpinner();
+
     // register service worker
     registerSW();
 });

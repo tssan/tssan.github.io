@@ -327,6 +327,9 @@
             const COLOR7 = "#7bae9d";
 
             btn.addEventListener("click", (e) => {
+                showSpinner();
+                btn.style.display = 'none';
+
                 const now = new Date();
                 const todayStr = now.toISOString().split('T')[0];
                 const doc = window.jspdf.jsPDF();
@@ -579,8 +582,11 @@
                 doc.setFontSize(DEFAULT_FONT_SIZE * 0.8);
                 doc.setTextColor(COLOR2);
                 doc.text(`dojoit.pl ${todayStr}`, PADDING, pageY - PADDING);
+
                 // save pdf
                 doc.save(`PiotrKarasinskiCV-${todayStr}.pdf`);
+                hideSpinner();
+                btn.style.display = 'block';
             });
         }
     }

@@ -354,6 +354,9 @@
             const COLOR7 = "#7bae9d";
 
             btn.addEventListener("click", (e) => {
+                showSpinner();
+                btn.style.display = 'none';
+
                 const now = new Date();
                 const todayStr = now.toISOString().split('T')[0];
                 const doc = window.jspdf.jsPDF();
@@ -606,8 +609,11 @@
                 doc.setFontSize(DEFAULT_FONT_SIZE * 0.8);
                 doc.setTextColor(COLOR2);
                 doc.text(`dojoit.pl ${todayStr}`, PADDING, pageY - PADDING);
+
                 // save pdf
                 doc.save(`PiotrKarasinskiCV-${todayStr}.pdf`);
+                hideSpinner();
+                btn.style.display = 'block';
             });
         }
     }
@@ -622,7 +628,10 @@
         Last updated: Tue 21 September 2021
         </p>
   </div>
+
 </div>
+
+<div id="spinner" style="display: none; z-index: 999999; font-size: 9rem; position: fixed; min-height: 100vh; top: 0px; left: 0px; right: 0px; bottom: 0px; text-align: center; padding: 20%; background-color: rgba(0, 0, 0, 0.8); color: #DD6E42;"><i class="fas fa-spinner fa-spin"></i></div>
 
 <script type="text/javascript" src="/theme/js/blog.js"></script>
 </body>
