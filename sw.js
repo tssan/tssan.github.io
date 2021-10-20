@@ -1,4 +1,4 @@
-const cacheName = 'dojoitPWA';
+const cacheName = 'dojoitPWA_v0.1.1';
 const staticAssets = [
     '/theme/js/blog.js',
     '/theme/css/blog.css',
