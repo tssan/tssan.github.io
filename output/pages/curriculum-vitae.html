@@ -39,8 +39,8 @@
 <div id="cv-wrapper">
 <button id="download-cv-pdf-btn"><i class="fas fa-file-download"></i></button>
 <section>
-    <h2>Expirience</h2>
-    <div class="cv-expirience">
+    <h2>Experience</h2>
+    <div class="cv-experience">
         <div class="event" data-caption="02.2021 to present">
             <h3>Freelance Programmer</h3>
             <div class="content">
@@ -180,7 +180,6 @@
     <h2>Skills & Technologies</h2>
     <div class="cv-skills">
         <div class="event">
-            <h3>Programming Languages</h3>
             <div class="content" data-caption="">
                 <div class="tags skills-langs"><span>Python</span><span>Javascript</span></div>
                 <div class="tags skills-os"><span>Linux</span><span>OSX</span><span>Windows</span></div>
@@ -214,7 +213,7 @@
 </div>
 
 <script type="text/javascript">
-    const EXPIRIENCE = [
+    const EXPERIENCE = [
         {
             date: "02.2021 to present",
             caption: "Freelance Programmer",
@@ -525,11 +524,11 @@
                 }
 
                 currentHeight += 15;
-                // Expirience
+                // Experience
                 doc.setFontSize(DEFAULT_FONT_SIZE * 2);
                 doc.setFont("ShareTechMono");
                 doc.setTextColor(COLOR3);
-                doc.text("EXPIRIENCE", MARGIN_LEFT2, currentHeight);
+                doc.text("EXPERIENCE", MARGIN_LEFT2, currentHeight);
                 currentHeight += 3.5;
                 doc.line(MARGIN_LEFT2, currentHeight, pageX - MARGIN_LEFT, currentHeight);
                 currentHeight += 8;
@@ -539,7 +538,7 @@
                 doc.setTextColor(COLOR1);
 
                 idx = 0;
-                for(const exp of EXPIRIENCE) {
+                for(const exp of EXPERIENCE) {
                     doc.setFontSize(DEFAULT_FONT_SIZE);
                     doc.setFont("RobotoB");
                     doc.text(exp.date, MARGIN_LEFT2, currentHeight);
@@ -579,7 +578,7 @@
                     }
 
                     idx++;
-                    if(idx < Object.keys(EXPIRIENCE).length) {
+                    if(idx < Object.keys(EXPERIENCE).length) {
                         currentHeight += 4;
                     }
                 }

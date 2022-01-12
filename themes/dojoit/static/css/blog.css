@@ -356,11 +356,11 @@ p > code {
     color: var(--secondary);
 }
 
-/* CV Expirience */
-.cv-expirience .event {
+/* CV Experience */
+.cv-experience .event {
     padding-top: var(--base-space);
 }
-.cv-expirience .event::before {
+.cv-experience .event::before {
     display: block;
     padding: var(--base-space);
     content: attr(data-caption);
@@ -371,33 +371,33 @@ p > code {
     border-bottom: 4px solid var(--secondary);
     margin-bottom: var(--base-space);
 }
-.cv-expirience .event h3 {
+.cv-experience .event h3 {
     color: var(--secondary);
 }
-.cv-expirience .event .content {
+.cv-experience .event .content {
     padding: var(--base-space);
 }
-.cv-expirience .event .content span.caption {
+.cv-experience .event .content span.caption {
     font-weight: bold;
     line-height: 1.5rem;
     padding-bottom: 5px;
 }
-.cv-expirience .event .content ul {
+.cv-experience .event .content ul {
     font-weight: normal;
     padding: calc(var(--base-space) / 2);
     line-height: 1.4rem;
 }
-.cv-expirience .event .content ul li {
+.cv-experience .event .content ul li {
     margin-left: 6px;
 }
 
 
 @media (min-width: 800px) {
-    .cv-expirience {
+    .cv-experience {
         position: relative;
         margin: 0 auto;
     }
-    .cv-expirience::after {
+    .cv-experience::after {
         display: block;
         content: '';
         position: absolute;
@@ -408,16 +408,16 @@ p > code {
         left: 30%;
         margin-left: 0px;
     }
-    .cv-expirience .event {
+    .cv-experience .event {
         position: relative;
         padding-left: calc(var(--base-space) * 2);
     }
-    .cv-expirience .event::before {
+    .cv-experience .event::before {
         display: inline;
         padding: 0;
         content: '';
     }
-    .cv-expirience .event::after {
+    .cv-experience .event::after {
         padding: var(--base-space);
         content: attr(data-caption);
         position: absolute;
@@ -432,12 +432,12 @@ p > code {
         border-top-left-radius: 5px;
         border-bottom-left-radius: 5px;
     }
-    .cv-expirience .event h3,
-    .cv-expirience .event .content {
+    .cv-experience .event h3,
+    .cv-experience .event .content {
         position: relative;
         left: 30%;
     }
-    .cv-expirience .event .content ul {
+    .cv-experience .event .content ul {
         font-weight: normal;
     }
 }
