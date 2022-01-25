@@ -7,13 +7,13 @@ Tags: cargo, rust, crypto
 
 # Preface
 
-Recently I started learning Rust language. I hava an idea for a simple crypto currency portfolio project. I figure out that I can learn and make something useful so I will create series about coding my first application in Rust language. Step by step I will try to implement crypto portfolio application. It will be a simple command line tool.
+Recently I started learning Rust language. I hava an idea for a simple crypto currency portfolio project. I thought that I can learn something new and make project at the same time so I decided to create series about coding my first application in Rust language. Step by step I will try to implement crypto portfolio application. It will be a simple command line tool.
 
->! This is not a tutorial for beginner programmers. It is for beginner Rust programmer and general programming knowledge will be required.
+> This is not a tutorial for beginners. General programming knowledge will be required.
 
 # Prerequisites
 
-* Installed `rustc`, `cargo`. Recommended way for installation is to use `rustup`. More information here: https://www.rust-lang.org/tools/install Below are te versions I will be using during this series:
+* Installed `rustc`, `cargo`. Recommended way for installation is to use `rustup`. More information here: https://www.rust-lang.org/tools/install Below are the versions I will be using during this series:
 
 ```bash
 ➜  ~ cargo -V
@@ -30,11 +30,12 @@ rustup 1.24.3 (ce5817a94 2021-05-31)
 
 Core:
 
-* offline
+* working offline
 * manage list of crypto assets (mainly crypto currencies, maybe also NFTs)
 * show total value of all assets
 * interface: command line
 * read and save data files
+* add/remove transactions (currency, amount, price, date, source)
 
 
 # Initialize project
@@ -56,7 +57,7 @@ Project folders and files structure should look like this:
     └── main.rs
 ```
 
-Inside `main.rs` file by default we have "hello world" program. You can compile and run it usign **cargo**:
+Inside `main.rs` file by default we have "hello world" program. You can compile and run it using **cargo**:
 
 `➜  cargo run`
 
@@ -103,7 +104,7 @@ if args.len() > 1 {
 
 First we must bring **io** into the scope. Then we declare `buffer` variable. And finally using `io::stdin().read_line` function we are updating `buffer` variable.
 
-As you probably noticed, after `read_line` function we call another function `unwrap`. This is done because `read_line` returns `Result<T, E>` that must be handled and function `unwrap` is doing that for us. This is not a best practice because program can still **panic**. For now lets leave it as it is. I'm sure we learn about proper handling that kind of situations in next episodes.
+As you probably noticed, after `read_line` we call another function `unwrap`. This is done because `read_line` returns `Result<T, E>` that must be handled and function `unwrap` is doing that for us. This is not a best practice because program can still **panic**. For now lets leave it as it is. I'm sure we learn about proper handling that kind of situations in next episodes.
 
 Full example:
 

@@ -37,13 +37,13 @@
     </header>
 
     <div class="content"><h1>Preface</h1>
-<p>Recently I started learning Rust language. I hava an idea for a simple crypto currency portfolio project. I figure out that I can learn and make something useful so I will create series about coding my first application in Rust language. Step by step I will try to implement crypto portfolio application. It will be a simple command line tool.</p>
+<p>Recently I started learning Rust language. I hava an idea for a simple crypto currency portfolio project. I thought that I can learn something new and make project at the same time so I decided to create series about coding my first application in Rust language. Step by step I will try to implement crypto portfolio application. It will be a simple command line tool.</p>
 <blockquote>
-<p>! This is not a tutorial for beginner programmers. It is for beginner Rust programmer and general programming knowledge will be required.</p>
+<p>This is not a tutorial for beginners. General programming knowledge will be required.</p>
 </blockquote>
 <h1>Prerequisites</h1>
 <ul>
-<li>Installed <code>rustc</code>, <code>cargo</code>. Recommended way for installation is to use <code>rustup</code>. More information here: https://www.rust-lang.org/tools/install Below are te versions I will be using during this series:</li>
+<li>Installed <code>rustc</code>, <code>cargo</code>. Recommended way for installation is to use <code>rustup</code>. More information here: https://www.rust-lang.org/tools/install Below are the versions I will be using during this series:</li>
 </ul>
 <div class="highlight"><pre><span></span><code>➜  ~ cargo -V
 cargo <span class="m">1</span>.57.0 <span class="o">(</span>b2e52d7ca <span class="m">2021</span>-10-21<span class="o">)</span>
@@ -59,11 +59,12 @@ rustup <span class="m">1</span>.24.3 <span class="o">(</span>ce5817a94 <span cla
 <h1>Project's assumtions and goals.</h1>
 <p>Core:</p>
 <ul>
-<li>offline</li>
+<li>working offline</li>
 <li>manage list of crypto assets (mainly crypto currencies, maybe also NFTs)</li>
 <li>show total value of all assets</li>
 <li>interface: command line</li>
 <li>read and save data files</li>
+<li>add/remove transactions (currency, amount, price, date, source)</li>
 </ul>
 <h1>Initialize project</h1>
 <p>You can create everything manually but since we have <strong>cargo</strong> just run:</p>
@@ -79,7 +80,7 @@ rustup <span class="m">1</span>.24.3 <span class="o">(</span>ce5817a94 <span cla
     └── main.rs
 </code></pre></div>
 
-<p>Inside <code>main.rs</code> file by default we have "hello world" program. You can compile and run it usign <strong>cargo</strong>:</p>
+<p>Inside <code>main.rs</code> file by default we have "hello world" program. You can compile and run it using <strong>cargo</strong>:</p>
 <p><code>➜  cargo run</code></p>
 <h1>Read command line arguments</h1>
 <blockquote>
@@ -112,7 +113,7 @@ rustup <span class="m">1</span>.24.3 <span class="o">(</span>ce5817a94 <span cla
 </code></pre></div>
 
 <p>First we must bring <strong>io</strong> into the scope. Then we declare <code>buffer</code> variable. And finally using <code>io::stdin().read_line</code> function we are updating <code>buffer</code> variable.</p>
-<p>As you probably noticed, after <code>read_line</code> function we call another function <code>unwrap</code>. This is done because <code>read_line</code> returns <code>Result&lt;T, E&gt;</code> that must be handled and function <code>unwrap</code> is doing that for us. This is not a best practice because program can still <strong>panic</strong>. For now lets leave it as it is. I'm sure we learn about proper handling that kind of situations in next episodes.</p>
+<p>As you probably noticed, after <code>read_line</code> we call another function <code>unwrap</code>. This is done because <code>read_line</code> returns <code>Result&lt;T, E&gt;</code> that must be handled and function <code>unwrap</code> is doing that for us. This is not a best practice because program can still <strong>panic</strong>. For now lets leave it as it is. I'm sure we learn about proper handling that kind of situations in next episodes.</p>
 <p>Full example:</p>
 <div class="highlight"><pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">env</span><span class="p">;</span><span class="w"></span>
 <span class="k">use</span><span class="w"> </span><span class="n">std</span>::<span class="n">io</span><span class="p">;</span><span class="w"></span>
@@ -145,7 +146,7 @@ rustup <span class="m">1</span>.24.3 <span class="o">(</span>ce5817a94 <span cla
 <p>I would like to learn how to separate code in files, modules etc..</p></div><!-- /.entry-content -->
 
     <footer class="post-info">
-        <div class="published">Tue 11 January 2022</div>
+        <div class="published">Wed 12 January 2022</div>
 
 
         <div class="author">
