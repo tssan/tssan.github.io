@@ -1,0 +1,12 @@
+*.pyc
+__pycache__/
+
+*.DS_Store
+
+.Python
+*.egg-info/
+*.egg
+
+*.sublime-*
+
+.venv/

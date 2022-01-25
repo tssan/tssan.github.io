@@ -152,24 +152,24 @@ quotes-api:
 <p>First step in creating PWA page is adding mainfest file into the head block.</p>
 <p><code>&lt;link rel="manifest" href="/manifest.webmanifest"/&gt;</code></p>
 <p>Manifest is just a JSON file. There are few required attributes to make it work, here is an example of how a manifest can look like:</p>
-<div class="highlight"><pre><span></span><code><span class="err">//</span> <span class="err">ma</span><span class="kc">n</span><span class="err">i</span><span class="kc">fest</span><span class="err">.webma</span><span class="kc">n</span><span class="err">i</span><span class="kc">fest</span>
+<div class="highlight"><pre><span></span><code><span class="err">//</span><span class="w"> </span><span class="err">ma</span><span class="kc">n</span><span class="err">i</span><span class="kc">fest</span><span class="err">.webma</span><span class="kc">n</span><span class="err">i</span><span class="kc">fest</span><span class="w"></span>
 
-<span class="p">{</span>
-    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Quotes PWA&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;short_name&quot;</span><span class="p">:</span> <span class="s2">&quot;quotes&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;start_url&quot;</span><span class="p">:</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;display&quot;</span><span class="p">:</span> <span class="s2">&quot;standalone&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;background_color&quot;</span><span class="p">:</span> <span class="s2">&quot;#206846&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;theme_color&quot;</span><span class="p">:</span> <span class="s2">&quot;#206846&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Service Worker example.&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;icons&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="nt">&quot;src&quot;</span><span class="p">:</span> <span class="s2">&quot;icon.png&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;sizes&quot;</span><span class="p">:</span> <span class="s2">&quot;144x144&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;image/png&quot;</span>
-        <span class="p">}</span>
-    <span class="p">]</span>
-<span class="p">}</span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Quotes PWA&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;short_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;quotes&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;start_url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;display&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;standalone&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;background_color&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#206846&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;theme_color&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;#206846&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Service Worker example.&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;icons&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;src&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;icon.png&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;sizes&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;144x144&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;image/png&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </code></pre></div>
 
 <p>In Chrome Development Tools <code>Application</code> tab should show manifest parameters like so:</p>

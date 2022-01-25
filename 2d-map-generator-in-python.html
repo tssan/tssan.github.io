@@ -303,127 +303,127 @@
 <p>After you run <code>make env-setup</code> run you should have generated map in <code>.maps</code> folder. There is a chance that you get an exception <code>ValueError: empty range for randrange() (1,1, 0)</code>. It will occurs if in any <code>randint</code> arguments will have same values. It is an edge case that we will soon fix.</p>
 <h1>Map parameters and constraints</h1>
 <p>Let's take care of TODO list created at very beginning of this article. Starting with default options in generator.py:</p>
-<div class="highlight"><pre><span></span><code># generator.py
+<div class="highlight"><pre><span></span><code><span class="w"># generator.py</span>
 
-import os
+<span class="w">import os</span>
 
-<span class="gi">+ from rand2dmap.tree import (</span>
-<span class="gi">+     Rect,</span>
-<span class="gi">+     split_tree_of_rectangles,</span>
-<span class="gi">+     SplitRectangleError</span>
-<span class="gi">+ )</span>
-<span class="gi">+</span>
-<span class="gi">+ DEFAULT_OPTIONS = {</span>
-<span class="gi">+     &#39;padding&#39;: 1,</span>
-<span class="gi">+     &#39;min_wall_size&#39;: 2,</span>
-<span class="gi">+     &#39;min_walls_ratio&#39;: 0.4,</span>
-<span class="gi">+     &#39;min_area_percent&#39;: 0.3</span>
-<span class="gi">+ }</span>
+<span class="gi">+ from rand2dmap.tree import (</span><span class="w"></span>
+<span class="gi">+     Rect,</span><span class="w"></span>
+<span class="gi">+     split_tree_of_rectangles,</span><span class="w"></span>
+<span class="gi">+     SplitRectangleError</span><span class="w"></span>
+<span class="gi">+ )</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+ DEFAULT_OPTIONS = {</span><span class="w"></span>
+<span class="gi">+     &#39;padding&#39;: 1,</span><span class="w"></span>
+<span class="gi">+     &#39;min_wall_size&#39;: 2,</span><span class="w"></span>
+<span class="gi">+     &#39;min_walls_ratio&#39;: 0.4,</span><span class="w"></span>
+<span class="gi">+     &#39;min_area_percent&#39;: 0.3</span><span class="w"></span>
+<span class="gi">+ }</span><span class="w"></span>
 
-MAP_WIDTH = 100
-MAP_HEIGHT = 100
+<span class="w">MAP_WIDTH = 100</span>
+<span class="w">MAP_HEIGHT = 100</span>
 
-<span class="gi">+ SPLITS = 5</span>
+<span class="gi">+ SPLITS = 5</span><span class="w"></span>
 
-MAPS_PATH = &#39;./.maps&#39;
+<span class="w">MAPS_PATH = &#39;./.maps&#39;</span>
 
 
-<span class="gi">+ wrap_rect = Rect(0, 0, MAP_WIDTH, MAP_HEIGHT, DEFAULT_OPTIONS)</span>
-<span class="gi">+ tree = None</span>
-<span class="gi">+ while tree is None:</span>
-<span class="gi">+     try:</span>
-<span class="gi">+         tree = split_tree_of_rectangles(wrap_rect, SPLITS, DEFAULT_OPTIONS)</span>
-<span class="gi">+     except SplitRectangleError:</span>
-<span class="gi">+         print(&#39;.&#39;, end=&#39;&#39;)</span>
+<span class="gi">+ wrap_rect = Rect(0, 0, MAP_WIDTH, MAP_HEIGHT, DEFAULT_OPTIONS)</span><span class="w"></span>
+<span class="gi">+ tree = None</span><span class="w"></span>
+<span class="gi">+ while tree is None:</span><span class="w"></span>
+<span class="gi">+     try:</span><span class="w"></span>
+<span class="gi">+         tree = split_tree_of_rectangles(wrap_rect, SPLITS, DEFAULT_OPTIONS)</span><span class="w"></span>
+<span class="gi">+     except SplitRectangleError:</span><span class="w"></span>
+<span class="gi">+         print(&#39;.&#39;, end=&#39;&#39;)</span><span class="w"></span>
 </code></pre></div>
 
 <p>I have created <code>SplitRectangleError</code> exception class. In case something goes wrong we will retry until tree instance is created.</p>
 <p>Adding modifications to the <code>Rect</code> class.</p>
-<div class="highlight"><pre><span></span><code>  class Rect:
-<span class="gi">+     def __init__(self, x, y, width, height, options):</span>
-          self.x = x
-          self.y = y
-          self.width = width
-          self.height = height
-<span class="gi">+         self.options = options</span>
-<span class="gi">+         self._area = None</span>
-          self._room = None
+<div class="highlight"><pre><span></span><code><span class="w"> </span> class Rect:<span class="w"></span>
+<span class="gi">+     def __init__(self, x, y, width, height, options):</span><span class="w"></span>
+<span class="w"> </span>         self.x = x<span class="w"></span>
+<span class="w"> </span>         self.y = y<span class="w"></span>
+<span class="w"> </span>         self.width = width<span class="w"></span>
+<span class="w"> </span>         self.height = height<span class="w"></span>
+<span class="gi">+         self.options = options</span><span class="w"></span>
+<span class="gi">+         self._area = None</span><span class="w"></span>
+<span class="w"> </span>         self._room = None<span class="w"></span>
 
-<span class="gi">+     @property</span>
-<span class="gi">+     def area(self):</span>
-<span class="gi">+         if self._area is None:</span>
-<span class="gi">+             self._area = self.width * self.height</span>
-<span class="gi">+         return self._area</span>
-<span class="gi">+</span>
-      @property
-      def room(self):
-          if self._room is None:
-              self._room = self.create_room()
-          return self._room
+<span class="gi">+     @property</span><span class="w"></span>
+<span class="gi">+     def area(self):</span><span class="w"></span>
+<span class="gi">+         if self._area is None:</span><span class="w"></span>
+<span class="gi">+             self._area = self.width * self.height</span><span class="w"></span>
+<span class="gi">+         return self._area</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="w"> </span>     @property<span class="w"></span>
+<span class="w"> </span>     def room(self):<span class="w"></span>
+<span class="w"> </span>         if self._room is None:<span class="w"></span>
+<span class="w"> </span>             self._room = self.create_room()<span class="w"></span>
+<span class="w"> </span>         return self._room<span class="w"></span>
 
-      def create_room(self):
-<span class="gi">+         padding = self.options[&#39;padding&#39;]</span>
-<span class="gi">+         min_wall_size = self.options[&#39;min_wall_size&#39;]</span>
-<span class="gi">+         min_walls_ratio = self.options[&#39;min_walls_ratio&#39;]</span>
-<span class="gi">+         min_area_percent = self.options[&#39;min_area_percent&#39;]</span>
-<span class="gi">+</span>
-<span class="gi">+         x = randint(self.x + padding, self.x + int(self.width / 2))</span>
-<span class="gi">+         y = randint(self.y + padding, self.y + int(self.height / 2))</span>
-<span class="gi">+</span>
-<span class="gi">+         width = randint(min_wall_size, self.x + self.width - x)</span>
-<span class="gi">+         height = randint(min_wall_size, self.y + self.height - y)</span>
-<span class="gi">+</span>
-<span class="gi">+         if (height / width &lt; min_walls_ratio or width / height &lt; min_walls_ratio or</span>
-<span class="gi">+                 width * height &lt; min_area_percent * self.area):</span>
-<span class="gi">+             return self.create_room()</span>
-<span class="gi">+</span>
-<span class="gi">+         return Rect(x, y, width, height, self.options)</span>
+<span class="w"> </span>     def create_room(self):<span class="w"></span>
+<span class="gi">+         padding = self.options[&#39;padding&#39;]</span><span class="w"></span>
+<span class="gi">+         min_wall_size = self.options[&#39;min_wall_size&#39;]</span><span class="w"></span>
+<span class="gi">+         min_walls_ratio = self.options[&#39;min_walls_ratio&#39;]</span><span class="w"></span>
+<span class="gi">+         min_area_percent = self.options[&#39;min_area_percent&#39;]</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+         x = randint(self.x + padding, self.x + int(self.width / 2))</span><span class="w"></span>
+<span class="gi">+         y = randint(self.y + padding, self.y + int(self.height / 2))</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+         width = randint(min_wall_size, self.x + self.width - x)</span><span class="w"></span>
+<span class="gi">+         height = randint(min_wall_size, self.y + self.height - y)</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+         if (height / width &lt; min_walls_ratio or width / height &lt; min_walls_ratio or</span><span class="w"></span>
+<span class="gi">+                 width * height &lt; min_area_percent * self.area):</span><span class="w"></span>
+<span class="gi">+             return self.create_room()</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+         return Rect(x, y, width, height, self.options)</span><span class="w"></span>
 </code></pre></div>
 
 <p>We must consider paddings while calculating room's position. If ratio of walls or area doesn't meet the conditions we return self function and try again.</p>
 <p>Splitting rectangles we should also consider padding, <code>min_wall_size</code> and <code>min_walls_ratio</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="gi">+ def split_rect(rect, options):</span>
-<span class="gi">+     padding = options[&#39;padding&#39;]</span>
-<span class="gi">+     min_wall_size = options[&#39;min_wall_size&#39;]</span>
-<span class="gi">+     min_walls_ratio = options[&#39;min_walls_ratio&#39;]</span>
-<span class="gi">+</span>
-<span class="gi">+     min_split_size = 2 * padding + min_wall_size</span>
-<span class="gi">+</span>
-<span class="gi">+     # we don&#39;t want to split too small reactangle</span>
-<span class="gi">+     if rect.width &lt; 2 * min_split_size or rect.height &lt; 2 * min_split_size:</span>
-<span class="gi">+         raise SplitRectangleError()</span>
+<div class="highlight"><pre><span></span><code><span class="gi">+ def split_rect(rect, options):</span><span class="w"></span>
+<span class="gi">+     padding = options[&#39;padding&#39;]</span><span class="w"></span>
+<span class="gi">+     min_wall_size = options[&#39;min_wall_size&#39;]</span><span class="w"></span>
+<span class="gi">+     min_walls_ratio = options[&#39;min_walls_ratio&#39;]</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+     min_split_size = 2 * padding + min_wall_size</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+     # we don&#39;t want to split too small reactangle</span><span class="w"></span>
+<span class="gi">+     if rect.width &lt; 2 * min_split_size or rect.height &lt; 2 * min_split_size:</span><span class="w"></span>
+<span class="gi">+         raise SplitRectangleError()</span><span class="w"></span>
 
-      if randint(0, 1) == 0:  # split vertical
-          r1 = Rect(
-              rect.x, rect.y,
-<span class="gi">+             randint(min_split_size, rect.width), rect.height,</span>
-<span class="gi">+             options</span>
-<span class="gi">+         )</span>
-          r2 = Rect(
-              rect.x + r1.width, rect.y,
-<span class="gi">+             rect.width - r1.width, rect.height,</span>
-<span class="gi">+             options</span>
-<span class="gi">+         )</span>
-<span class="gi">+</span>
-<span class="gi">+         # retry if ratio is too small</span>
-<span class="gi">+         if r1.width / r1.height &lt; min_walls_ratio or r2.width / r2.height &lt; min_walls_ratio:</span>
-<span class="gi">+             return split_rect(rect, options)</span>
-      else:  # split horizontal
-          r1 = Rect(
-              rect.x, rect.y,
-<span class="gi">+             rect.width, randint(min_split_size, rect.height),</span>
-<span class="gi">+             options</span>
-<span class="gi">+         )</span>
-          r2 = Rect(
-              rect.x, rect.y + r1.height,
-<span class="gi">+             rect.width, rect.height - r1.height,</span>
-<span class="gi">+             options</span>
-<span class="gi">+         )</span>
-<span class="gi">+</span>
-<span class="gi">+         # retry if ratio is too small</span>
-<span class="gi">+         if r1.height / r1.width &lt; min_walls_ratio or r2.height / r2.width &lt; min_walls_ratio:</span>
-<span class="gi">+             return split_rect(rect, options)</span>
-      return r1, r2
+<span class="w"> </span>     if randint(0, 1) == 0:  # split vertical<span class="w"></span>
+<span class="w"> </span>         r1 = Rect(<span class="w"></span>
+<span class="w"> </span>             rect.x, rect.y,<span class="w"></span>
+<span class="gi">+             randint(min_split_size, rect.width), rect.height,</span><span class="w"></span>
+<span class="gi">+             options</span><span class="w"></span>
+<span class="gi">+         )</span><span class="w"></span>
+<span class="w"> </span>         r2 = Rect(<span class="w"></span>
+<span class="w"> </span>             rect.x + r1.width, rect.y,<span class="w"></span>
+<span class="gi">+             rect.width - r1.width, rect.height,</span><span class="w"></span>
+<span class="gi">+             options</span><span class="w"></span>
+<span class="gi">+         )</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+         # retry if ratio is too small</span><span class="w"></span>
+<span class="gi">+         if r1.width / r1.height &lt; min_walls_ratio or r2.width / r2.height &lt; min_walls_ratio:</span><span class="w"></span>
+<span class="gi">+             return split_rect(rect, options)</span><span class="w"></span>
+<span class="w"> </span>     else:  # split horizontal<span class="w"></span>
+<span class="w"> </span>         r1 = Rect(<span class="w"></span>
+<span class="w"> </span>             rect.x, rect.y,<span class="w"></span>
+<span class="gi">+             rect.width, randint(min_split_size, rect.height),</span><span class="w"></span>
+<span class="gi">+             options</span><span class="w"></span>
+<span class="gi">+         )</span><span class="w"></span>
+<span class="w"> </span>         r2 = Rect(<span class="w"></span>
+<span class="w"> </span>             rect.x, rect.y + r1.height,<span class="w"></span>
+<span class="gi">+             rect.width, rect.height - r1.height,</span><span class="w"></span>
+<span class="gi">+             options</span><span class="w"></span>
+<span class="gi">+         )</span><span class="w"></span>
+<span class="gi">+</span><span class="w"></span>
+<span class="gi">+         # retry if ratio is too small</span><span class="w"></span>
+<span class="gi">+         if r1.height / r1.width &lt; min_walls_ratio or r2.height / r2.width &lt; min_walls_ratio:</span><span class="w"></span>
+<span class="gi">+             return split_rect(rect, options)</span><span class="w"></span>
+<span class="w"> </span>     return r1, r2<span class="w"></span>
 </code></pre></div>
 
 <p>Don't forget to pass <code>options</code> inside <code>split_tree_of_rectangles</code> function. Checkout to part2 tag to see all changes we made.</p>
